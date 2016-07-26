@@ -1,9 +1,9 @@
 package org.lokra.seaweedfs;
 
 /**
- * Created by ChihoSin on 16/7/22.
+ * @author Chiho Sin
  */
-public class Assign {
+public class AssignFileKeyResult {
 
     private Integer count;
     private String fid;
@@ -44,7 +44,7 @@ public class Assign {
 
     @Override
     public String toString() {
-        return "Assign{" +
+        return "AssignFileKeyResult{" +
                 "count=" + count +
                 ", fid='" + fid + '\'' +
                 ", url='" + url + '\'' +
