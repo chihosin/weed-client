@@ -12,7 +12,6 @@ before_script:
   - nohup weed server -master.port=9334 -ip=0.0.0.0 -dir=/tmp/weed/2 -volume.port=9444 -master.peers=0.0.0.0:9333 >/dev/null 2>&1 &
   - nohup weed server -master.port=9335 -ip=0.0.0.0 -dir=/tmp/weed/3 -volume.port=9445 -master.peers=0.0.0.0:9334 >/dev/null 2>&1 &
   - gradle check
-  - gradle assemble
 
 script:
   - gradle test -i
