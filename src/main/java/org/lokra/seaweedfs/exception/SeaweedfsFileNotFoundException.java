@@ -1,4 +1,4 @@
-package org.lokra.seaweedfs;
+package org.lokra.seaweedfs.exception;
 
 /**
  * Created by ChihoSin on 16/7/22.

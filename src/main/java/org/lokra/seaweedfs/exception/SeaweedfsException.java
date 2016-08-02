@@ -1,4 +1,4 @@
-package org.lokra.seaweedfs;
+package org.lokra.seaweedfs.exception;
 
 import java.io.IOException;
 

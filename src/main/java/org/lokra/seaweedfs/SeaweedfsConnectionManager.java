@@ -1,7 +1,9 @@
-package org.lokra.seaweedfs.connection;
+package org.lokra.seaweedfs;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.lokra.seaweedfs.core.SystemConnection;
+import org.lokra.seaweedfs.util.ConnectionUtil;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 
@@ -21,34 +23,28 @@ public class SeaweedfsConnectionManager implements InitializingBean, DisposableB
     private int timeout = 10000;
     private int pollCycle = 30000;
 
-
-    private MasterConnection masterConnection;
-    private VolumeConnection volumeConnection;
+    private SystemConnection systemConnection;
 
     public SeaweedfsConnectionManager() {
     }
 
-    public MasterConnection getMasterConnection() {
-        return masterConnection;
-    }
-
-    public VolumeConnection getVolumeConnection() {
-        return volumeConnection;
+    public SystemConnection getSystemConnection() {
+        return systemConnection;
     }
 
     /**
      * Start up the connection to the Seaweedfs server
      */
     public void startup() throws IOException {
-        log.info("start connect to the seaweedfs master server [" +
+        log.info("start connect to the seaweedfs core server [" +
                 ConnectionUtil.convertUrlWithScheme(host + ":" + port) + "]");
-        if (this.masterConnection == null) {
-            this.masterConnection = new MasterConnection(
+        if (this.systemConnection == null) {
+            this.systemConnection = new SystemConnection(
                     ConnectionUtil.convertUrlWithScheme(host + ":" + port),
                     this.timeout,
                     this.pollCycle);
         }
-        this.masterConnection.startup();
+        this.systemConnection.startup();
 
     }
 
@@ -56,9 +52,9 @@ public class SeaweedfsConnectionManager implements InitializingBean, DisposableB
      * Shutdown connect to the any Seaweedfs server
      */
     public void shutdown() {
-        log.info("stop connect to the seaweedfs master server");
-        if (this.masterConnection != null)
-            this.masterConnection.stop();
+        log.info("stop connect to the seaweedfs core server");
+        if (this.systemConnection != null)
+            this.systemConnection.stop();
     }
 
     /**

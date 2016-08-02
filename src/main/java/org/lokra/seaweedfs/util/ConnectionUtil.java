@@ -1,4 +1,4 @@
-package org.lokra.seaweedfs.connection;
+package org.lokra.seaweedfs.util;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -13,7 +13,7 @@ import java.io.IOException;
  *
  * @author Chiho Sin
  */
-class ConnectionUtil {
+public class ConnectionUtil {
 
     /**
      * Check uri link is alive, the basis for judging response status code.
@@ -22,7 +22,7 @@ class ConnectionUtil {
      * @param url    check url
      * @return When the response status code is 200, the result is true.
      */
-    static boolean checkUriAlive(HttpClient client, String url, RequestConfig requestConfig) {
+    public static boolean checkUriAlive(HttpClient client, String url, RequestConfig requestConfig) {
         try {
             final HttpGet peerRequest = new HttpGet(url);
 
@@ -41,7 +41,7 @@ class ConnectionUtil {
      *
      * @param serverUrl url without scheme
      */
-    static String convertUrlWithScheme(String serverUrl) {
+    public static String convertUrlWithScheme(String serverUrl) {
         return "http://" + serverUrl;
     }
 

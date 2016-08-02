@@ -1,18 +1,15 @@
-package org.lokra.seaweedfs.connection;
+package org.lokra.seaweedfs.core.master;
 
-import com.sun.istack.internal.NotNull;
-
-import java.net.URI;
 
 /**
- * Created by ChihoSin on 16/7/22.
+ * @author Chiho Sin
  */
-public class ServerStatus {
+public class MasterStatus {
 
     private String url;
     private boolean isActive;
 
-    public ServerStatus(@NotNull String url) {
+    public MasterStatus(String url) {
         this.url = url;
     }
 
@@ -34,7 +31,7 @@ public class ServerStatus {
 
     @Override
     public String toString() {
-        return "ServerStatus{" +
+        return "MasterStatus{" +
                 "url=" + url +
                 ", isActive=" + isActive +
                 '}';

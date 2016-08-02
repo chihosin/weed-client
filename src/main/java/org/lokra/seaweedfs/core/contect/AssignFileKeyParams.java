@@ -1,6 +1,4 @@
-package org.lokra.seaweedfs;
-
-import com.sun.istack.internal.NotNull;
+package org.lokra.seaweedfs.core.contect;
 
 /**
  * @author Chiho Sin
@@ -22,7 +20,7 @@ public class AssignFileKeyParams {
         this.count = count;
     }
 
-    public AssignFileKeyParams(@NotNull String replication, int count, @NotNull String dataCenter) {
+    public AssignFileKeyParams(String replication, int count, String dataCenter) {
         this.replication = replication;
         this.count = count;
         this.dataCenter = dataCenter;
@@ -32,7 +30,7 @@ public class AssignFileKeyParams {
         return replication;
     }
 
-    public void setReplication(@NotNull String replication) {
+    public void setReplication(String replication) {
         this.replication = replication;
     }
 
@@ -48,7 +46,7 @@ public class AssignFileKeyParams {
         return dataCenter;
     }
 
-    public void setDataCenter(@NotNull String dataCenter) {
+    public void setDataCenter(String dataCenter) {
         this.dataCenter = dataCenter;
     }
 

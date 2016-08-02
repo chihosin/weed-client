@@ -1,4 +1,4 @@
-package org.lokra.seaweedfs;
+package org.lokra.seaweedfs.core.contect;
 
 /**
  * @author Chiho Sin
