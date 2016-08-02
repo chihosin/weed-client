@@ -3,7 +3,7 @@ sudo: true
 
 install:
   - wget https://bintray.com/chrislusf/seaweedfs/download_file?file_path=go_0.70_amd64.deb
-  - dpkg -i go_0.70_amd64.deb
+  - sudo dpkg -i go_0.70_amd64.deb
   - weed version
 
 before_script:
