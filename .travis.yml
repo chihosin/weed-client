@@ -15,4 +15,4 @@ before_script:
   - gradle assemble
 
 script:
-  - gradle test
+  - gradle test -i
