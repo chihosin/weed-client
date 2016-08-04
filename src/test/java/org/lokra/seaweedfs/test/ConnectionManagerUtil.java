@@ -7,7 +7,7 @@ import java.io.IOException;
 /**
  * @author Chiho Sin
  */
-public class TestUtil {
+public class ConnectionManagerUtil {
 
     public static SeaweedfsConnectionManager connectionManager;
 

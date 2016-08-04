@@ -9,9 +9,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.util.EntityUtils;
 import org.lokra.seaweedfs.core.SystemConnection;
-import org.lokra.seaweedfs.core.contect.AssignFileKeyParams;
-import org.lokra.seaweedfs.core.contect.AssignFileKeyResult;
-import org.lokra.seaweedfs.core.contect.ForceGarbageCollectionParams;
+import org.lokra.seaweedfs.core.contect.*;
 import org.lokra.seaweedfs.exception.SeaweedfsException;
 import org.lokra.seaweedfs.util.HttpApiStrategy;
 
@@ -77,6 +75,37 @@ public class MasterWrapper {
         try {
             response = connection.getClientFromPool().execute(request, HttpClientContext.create());
             EntityUtils.consume(response.getEntity());
+        } finally {
+            if (response != null) {
+                try {
+                    response.close();
+                } catch (IOException ignored) {
+                }
+            }
+            request.releaseConnection();
+        }
+    }
+
+    /**
+     * Pre-Allocate volumes.
+     *
+     * @param params
+     * @return
+     * @throws IOException
+     */
+    public PreAllocateVolumesResult preAllocateVolumes(PreAllocateVolumesParams params) throws IOException {
+        checkConnection();
+        CloseableHttpResponse response = null;
+        final String url = connection.getLeaderUrl() + HttpApiStrategy.preAllocateVolumes + params.toUrlParams();
+        HttpGet request = new HttpGet(url);
+        request.setHeader("Connection", "close");
+        try {
+            response = connection.getClientFromPool().execute(request, HttpClientContext.create());
+            HttpEntity entity = response.getEntity();
+            final String json = EntityUtils.toString(entity);
+            PreAllocateVolumesResult result = objectMapper.readValue(json, PreAllocateVolumesResult.class);
+            EntityUtils.consume(entity);
+            return result;
         } finally {
             if (response != null) {
                 try {
