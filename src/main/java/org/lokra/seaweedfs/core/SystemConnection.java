@@ -3,13 +3,9 @@ package org.lokra.seaweedfs.core;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpRequestBase;
-import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
@@ -21,10 +17,9 @@ import org.lokra.seaweedfs.core.topology.Layout;
 import org.lokra.seaweedfs.core.topology.Rack;
 import org.lokra.seaweedfs.exception.SeaweedfsException;
 import org.lokra.seaweedfs.util.ConnectionUtil;
-import org.lokra.seaweedfs.util.HttpApiStrategy;
+import org.lokra.seaweedfs.util.ServerApiStrategy;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -156,7 +151,7 @@ public class SystemConnection {
         CloseableHttpClient httpClient = HttpClients.createDefault();
         MasterStatus leader;
         HashMap<String, MasterStatus> peers;
-        final HttpGet request = new HttpGet(masterUrl + HttpApiStrategy.checkClusterStatus);
+        final HttpGet request = new HttpGet(masterUrl + ServerApiStrategy.checkClusterStatus);
         request.setConfig(defaultRequestConfig);
         final ResponseHandler<String> responseHandler = new BasicResponseHandler();
         final String response = httpClient.execute(request, responseHandler);
@@ -213,7 +208,7 @@ public class SystemConnection {
             try {
                 String result;
                 for (String uri : peers.keySet()) {
-                    final HttpGet request = new HttpGet(uri + HttpApiStrategy.checkClusterStatus);
+                    final HttpGet request = new HttpGet(uri + ServerApiStrategy.checkClusterStatus);
                     request.setConfig(defaultRequestConfig);
                     final ResponseHandler<String> responseHandler = new BasicResponseHandler();
                     String response;
@@ -247,7 +242,7 @@ public class SystemConnection {
     @SuppressWarnings("unchecked")
     private SystemTopologyStatus fetchSystemTopologyStatus(String masterUrl) throws IOException {
         CloseableHttpClient httpClient = HttpClients.createDefault();
-        final HttpGet request = new HttpGet(masterUrl + HttpApiStrategy.checkTopologyStatus);
+        final HttpGet request = new HttpGet(masterUrl + ServerApiStrategy.checkTopologyStatus);
         request.setConfig(defaultRequestConfig);
         final ResponseHandler<String> responseHandler = new BasicResponseHandler();
         final String response = httpClient.execute(request, responseHandler);

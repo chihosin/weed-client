@@ -1,6 +1,5 @@
 package org.lokra.seaweedfs.core.master;
 
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -13,7 +12,7 @@ import org.apache.http.util.EntityUtils;
 import org.lokra.seaweedfs.core.SystemConnection;
 import org.lokra.seaweedfs.core.contect.*;
 import org.lokra.seaweedfs.exception.SeaweedfsException;
-import org.lokra.seaweedfs.util.HttpApiStrategy;
+import org.lokra.seaweedfs.util.ServerApiStrategy;
 
 import java.io.IOException;
 import java.util.Map;
@@ -40,7 +39,7 @@ public class MasterWrapper {
      * @throws IOException
      */
     public AssignFileKeyResult assignFileKey(AssignFileKeyParams params) throws IOException {
-        final String url = connection.getLeaderUrl() + HttpApiStrategy.assignFileKey + params.toUrlParams();
+        final String url = connection.getLeaderUrl() + ServerApiStrategy.assignFileKey + params.toUrlParams();
         HttpGet request = new HttpGet(url);
         String json = fetchJsonResultByRequest(request);
         return objectMapper.readValue(json, AssignFileKeyResult.class);
@@ -53,7 +52,7 @@ public class MasterWrapper {
      * @throws IOException
      */
     public void forceGarbageCollection(ForceGarbageCollectionParams params) throws IOException {
-        final String url = connection.getLeaderUrl() + HttpApiStrategy.forceGarbageCollection + params.toUrlParams();
+        final String url = connection.getLeaderUrl() + ServerApiStrategy.forceGarbageCollection + params.toUrlParams();
         HttpGet request = new HttpGet(url);
         fetchJsonResultByRequest(request);
     }
@@ -66,7 +65,7 @@ public class MasterWrapper {
      * @throws IOException
      */
     public PreAllocateVolumesResult preAllocateVolumes(PreAllocateVolumesParams params) throws IOException {
-        final String url = connection.getLeaderUrl() + HttpApiStrategy.preAllocateVolumes + params.toUrlParams();
+        final String url = connection.getLeaderUrl() + ServerApiStrategy.preAllocateVolumes + params.toUrlParams();
         HttpGet request = new HttpGet(url);
         String json = fetchJsonResultByRequest(request);
         return objectMapper.readValue(json, PreAllocateVolumesResult.class);
@@ -80,7 +79,7 @@ public class MasterWrapper {
      * @throws IOException
      */
     public LookupVolumeResult lookupVolume(LookupVolumeParams params) throws IOException {
-        final String url = connection.getLeaderUrl() + HttpApiStrategy.lookupVolume + params.toUrlParams();
+        final String url = connection.getLeaderUrl() + ServerApiStrategy.lookupVolume + params.toUrlParams();
         HttpGet request = new HttpGet(url);
         String json = fetchJsonResultByRequest(request);
         return objectMapper.readValue(json, LookupVolumeResult.class);

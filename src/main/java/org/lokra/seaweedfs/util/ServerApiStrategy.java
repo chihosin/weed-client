@@ -3,7 +3,7 @@ package org.lokra.seaweedfs.util;
 /**
  * @author Chiho Sin
  */
-public class HttpApiStrategy {
+public class ServerApiStrategy {
 
     public static final String assignFileKey = "/dir/assign";
     public static final String checkClusterStatus = "/cluster/status";
