@@ -3,12 +3,17 @@ package org.lokra.seaweedfs.core;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.lokra.seaweedfs.core.master.MasterStatus;
 import org.lokra.seaweedfs.core.topology.DataCenter;
 import org.lokra.seaweedfs.core.topology.DataNode;
@@ -19,10 +24,12 @@ import org.lokra.seaweedfs.util.ConnectionUtil;
 import org.lokra.seaweedfs.util.HttpApiStrategy;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Master server connection control
@@ -42,6 +49,9 @@ public class SystemConnection {
     private PollClusterStatusThread pollClusterStatusThread;
     private RequestConfig defaultRequestConfig = RequestConfig.DEFAULT;
     private ObjectMapper objectMapper = new ObjectMapper();
+    private PoolingHttpClientConnectionManager clientConnectionManager;
+    private IdleConnectionMonitorThread idleConnectionMonitorThread;
+    private CloseableHttpClient httpClient;
 
     /**
      * Constructor.
@@ -50,7 +60,11 @@ public class SystemConnection {
      * @param timeout   server connect timeout
      * @param pollCycle polls for server change cycle time
      */
-    public SystemConnection(String leaderUrl, int timeout, int pollCycle)
+    public SystemConnection(String leaderUrl,
+                            int timeout,
+                            int pollCycle,
+                            int maxConnection,
+                            int maxConnectionsPreRoute)
             throws IOException {
         this.leaderUrl = leaderUrl;
         this.requestConfig = RequestConfig.custom()
@@ -58,6 +72,14 @@ public class SystemConnection {
                 .build();
         this.pollCycle = pollCycle;
         this.pollClusterStatusThread = new PollClusterStatusThread();
+        this.idleConnectionMonitorThread = new IdleConnectionMonitorThread();
+        this.clientConnectionManager = new PoolingHttpClientConnectionManager();
+        this.clientConnectionManager.setMaxTotal(maxConnection);
+        this.clientConnectionManager.setDefaultMaxPerRoute(maxConnectionsPreRoute);
+        this.httpClient = HttpClients.custom()
+                .setConnectionManager(this.clientConnectionManager)
+                .setDefaultRequestConfig(this.defaultRequestConfig)
+                .build();
     }
 
     /**
@@ -66,6 +88,7 @@ public class SystemConnection {
     public void startup() {
         log.info("core connection is startup now");
         this.pollClusterStatusThread.start();
+        this.idleConnectionMonitorThread.start();
     }
 
     /**
@@ -73,7 +96,8 @@ public class SystemConnection {
      */
     public void stop() {
         log.info("core connection is shutdown now");
-        this.pollClusterStatusThread.interrupt();
+        this.pollClusterStatusThread.shutdown();
+        this.idleConnectionMonitorThread.shutdown();
     }
 
     /**
@@ -108,8 +132,17 @@ public class SystemConnection {
      *
      * @return core server uri
      */
-    public String getConnectionUrl() {
+    public String getLeaderUrl() {
         return this.leaderUrl;
+    }
+
+    /**
+     * Get http client create with pool.
+     *
+     * @return Http client.
+     */
+    public CloseableHttpClient getClientFromPool() {
+        return httpClient;
     }
 
     /**
@@ -296,9 +329,11 @@ public class SystemConnection {
      */
     private class PollClusterStatusThread extends Thread {
 
+        private volatile boolean shutdown;
+
         @Override
         public void run() {
-            while (true) {
+            while (!shutdown) {
 
                 try {
                     fetchSystemStatus(leaderUrl);
@@ -333,10 +368,7 @@ public class SystemConnection {
 
                 try {
                     Thread.sleep(pollCycle);
-                } catch (InterruptedException e) {
-                    connectionClose = true;
-                    e.printStackTrace();
-                    break;
+                } catch (InterruptedException ignored) {
                 }
             }
         }
@@ -351,5 +383,44 @@ public class SystemConnection {
             log.debug("seaweedfs core leader is found [" + leaderUrl + "]");
         }
 
+        void shutdown() {
+            shutdown = true;
+            synchronized (this) {
+                notifyAll();
+            }
+        }
+
+    }
+
+    /**
+     * Thread for close expired connections.
+     */
+    private class IdleConnectionMonitorThread extends Thread {
+
+        private volatile boolean shutdown;
+
+        @Override
+        public void run() {
+            try {
+                while (!shutdown) {
+                    synchronized (this) {
+                        wait(pollCycle);
+                        // 关闭无效连接
+                        clientConnectionManager.closeExpiredConnections();
+                        // 关闭空闲超过30秒的
+                        clientConnectionManager.closeIdleConnections(30, TimeUnit.SECONDS);
+                        log.debug("http client pool state [" + clientConnectionManager.getTotalStats().toString() + "]");
+                    }
+                }
+            } catch (InterruptedException ignored) {
+            }
+        }
+
+        void shutdown() {
+            shutdown = true;
+            synchronized (this) {
+                notifyAll();
+            }
+        }
     }
 }

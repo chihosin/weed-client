@@ -59,7 +59,7 @@ public class AssignFileKeyParams {
             result = result + "dataCenter=" + dataCenter + "&";
         }
         if (count > 0) {
-            result = result + "dataCenter=" + Integer.toString(count) + "&";
+            result = result + "count=" + Integer.toString(count) + "&";
         }
         return result;
     }
