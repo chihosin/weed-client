@@ -3,25 +3,25 @@ package org.lokra.seaweedfs.core.contect;
 /**
  * @author Chiho Sin
  */
-public class AssignFileKeyParams {
+public class PreAllocateVolumesParams {
 
     private String replication;
     private int count;
     private String dataCenter;
     private String ttl;
 
-    public AssignFileKeyParams() {
+    public PreAllocateVolumesParams() {
     }
 
-    public AssignFileKeyParams(String dataCenter) {
+    public PreAllocateVolumesParams(String dataCenter) {
         this.dataCenter = dataCenter;
     }
 
-    public AssignFileKeyParams(int count) {
+    public PreAllocateVolumesParams(int count) {
         this.count = count;
     }
 
-    public AssignFileKeyParams(String replication, int count, String dataCenter, String ttl) {
+    public PreAllocateVolumesParams(String replication, int count, String dataCenter, String ttl) {
         this.replication = replication;
         this.count = count;
         this.dataCenter = dataCenter;
@@ -79,7 +79,7 @@ public class AssignFileKeyParams {
 
     @Override
     public String toString() {
-        return "AssignFileKeyParams{" +
+        return "PreAllocateVolumesParams{" +
                 "replication='" + replication + '\'' +
                 ", count=" + count +
                 ", dataCenter='" + dataCenter + '\'' +

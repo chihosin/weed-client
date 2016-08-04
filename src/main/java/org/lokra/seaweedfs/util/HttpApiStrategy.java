@@ -5,7 +5,7 @@ package org.lokra.seaweedfs.util;
  */
 public class HttpApiStrategy {
 
-    public static final String AssignFileKey = "/dir/assign";
+    public static final String assignFileKey = "/dir/assign";
     public static final String checkClusterStatus = "/cluster/status";
     public static final String checkTopologyStatus = "/dir/status";
     public static final String lookupVolume = "/dir/lookup";
