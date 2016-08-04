@@ -1,11 +1,13 @@
 package org.lokra.seaweedfs.core.master;
 
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.util.EntityUtils;
 import org.lokra.seaweedfs.core.SystemConnection;
@@ -14,6 +16,7 @@ import org.lokra.seaweedfs.exception.SeaweedfsException;
 import org.lokra.seaweedfs.util.HttpApiStrategy;
 
 import java.io.IOException;
+import java.util.Map;
 
 /**
  * @author Chiho Sin
@@ -37,27 +40,10 @@ public class MasterWrapper {
      * @throws IOException
      */
     public AssignFileKeyResult assignFileKey(AssignFileKeyParams params) throws IOException {
-        checkConnection();
-        CloseableHttpResponse response = null;
         final String url = connection.getLeaderUrl() + HttpApiStrategy.assignFileKey + params.toUrlParams();
         HttpGet request = new HttpGet(url);
-        request.setHeader("Connection", "close");
-        try {
-            response = connection.getClientFromPool().execute(request, HttpClientContext.create());
-            HttpEntity entity = response.getEntity();
-            final String json = EntityUtils.toString(entity);
-            AssignFileKeyResult result = objectMapper.readValue(json, AssignFileKeyResult.class);
-            EntityUtils.consume(entity);
-            return result;
-        } finally {
-            if (response != null) {
-                try {
-                    response.close();
-                } catch (IOException ignored) {
-                }
-            }
-            request.releaseConnection();
-        }
+        String json = fetchJsonResultByRequest(request);
+        return objectMapper.readValue(json, AssignFileKeyResult.class);
     }
 
     /**
@@ -67,23 +53,9 @@ public class MasterWrapper {
      * @throws IOException
      */
     public void forceGarbageCollection(ForceGarbageCollectionParams params) throws IOException {
-        checkConnection();
-        CloseableHttpResponse response = null;
         final String url = connection.getLeaderUrl() + HttpApiStrategy.forceGarbageCollection + params.toUrlParams();
         HttpGet request = new HttpGet(url);
-        request.setHeader("Connection", "close");
-        try {
-            response = connection.getClientFromPool().execute(request, HttpClientContext.create());
-            EntityUtils.consume(response.getEntity());
-        } finally {
-            if (response != null) {
-                try {
-                    response.close();
-                } catch (IOException ignored) {
-                }
-            }
-            request.releaseConnection();
-        }
+        fetchJsonResultByRequest(request);
     }
 
     /**
@@ -94,18 +66,44 @@ public class MasterWrapper {
      * @throws IOException
      */
     public PreAllocateVolumesResult preAllocateVolumes(PreAllocateVolumesParams params) throws IOException {
-        checkConnection();
-        CloseableHttpResponse response = null;
         final String url = connection.getLeaderUrl() + HttpApiStrategy.preAllocateVolumes + params.toUrlParams();
         HttpGet request = new HttpGet(url);
+        String json = fetchJsonResultByRequest(request);
+        return objectMapper.readValue(json, PreAllocateVolumesResult.class);
+    }
+
+    /**
+     * Lookup volume.
+     *
+     * @param params
+     * @return
+     * @throws IOException
+     */
+    public LookupVolumeResult lookupVolume(LookupVolumeParams params) throws IOException {
+        final String url = connection.getLeaderUrl() + HttpApiStrategy.lookupVolume + params.toUrlParams();
+        HttpGet request = new HttpGet(url);
+        String json = fetchJsonResultByRequest(request);
+        return objectMapper.readValue(json, LookupVolumeResult.class);
+    }
+
+    /**
+     * Fetch http API json result.
+     *
+     * @param request
+     * @return
+     * @throws IOException
+     */
+    private String fetchJsonResultByRequest(HttpRequestBase request) throws IOException {
+        checkConnection();
+        CloseableHttpResponse response = null;
         request.setHeader("Connection", "close");
+        String json = null;
+
         try {
             response = connection.getClientFromPool().execute(request, HttpClientContext.create());
             HttpEntity entity = response.getEntity();
-            final String json = EntityUtils.toString(entity);
-            PreAllocateVolumesResult result = objectMapper.readValue(json, PreAllocateVolumesResult.class);
+            json = EntityUtils.toString(entity);
             EntityUtils.consume(entity);
-            return result;
         } finally {
             if (response != null) {
                 try {
@@ -115,8 +113,22 @@ public class MasterWrapper {
             }
             request.releaseConnection();
         }
+
+        if (json.contains("\"error\":\"")) {
+            Map map = objectMapper.readValue(json, Map.class);
+            final String errorMsg = (String) map.get("error");
+            if (errorMsg != null)
+                throw new SeaweedfsException("seaweedfs error: " + errorMsg);
+        }
+
+        return json;
     }
 
+    /**
+     * Check connection is alive.
+     *
+     * @throws SeaweedfsException
+     */
     private void checkConnection() throws SeaweedfsException {
         if (this.connection.isConnectionClose())
             throw new SeaweedfsException("connection is closed");

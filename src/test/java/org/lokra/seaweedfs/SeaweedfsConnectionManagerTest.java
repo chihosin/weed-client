@@ -11,7 +11,7 @@ import org.lokra.seaweedfs.test.ConnectionManagerUtil;
  */
 public class SeaweedfsConnectionManagerTest {
 
-    public static SeaweedfsConnectionManager manager;
+    private static SeaweedfsConnectionManager manager;
 
     @Test
     public void getSystemConnection() throws Exception {

@@ -3,8 +3,7 @@ package org.lokra.seaweedfs.core.contect;
 /**
  * @author Chiho Sin
  */
-public class VolumeLocationsResult {
-
+public class Location {
     private String url;
     private String publicUrl;
 
@@ -26,7 +25,7 @@ public class VolumeLocationsResult {
 
     @Override
     public String toString() {
-        return "VolumeLocationsResult{" +
+        return "Location{" +
                 "url='" + url + '\'' +
                 ", publicUrl='" + publicUrl + '\'' +
                 '}';

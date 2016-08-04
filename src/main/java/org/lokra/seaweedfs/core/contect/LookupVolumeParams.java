@@ -3,19 +3,16 @@ package org.lokra.seaweedfs.core.contect;
 /**
  * @author Chiho Sin
  */
-public class VolumeLocationsParams {
+public class LookupVolumeParams {
 
     private String volumeId;
     private String collection;
 
-    public VolumeLocationsParams() {
-    }
-
-    public VolumeLocationsParams(String volumeId) {
+    public LookupVolumeParams(String volumeId) {
         this.volumeId = volumeId;
     }
 
-    public VolumeLocationsParams(String volumeId, String collection) {
+    public LookupVolumeParams(String volumeId, String collection) {
         this.volumeId = volumeId;
         this.collection = collection;
     }
@@ -36,20 +33,20 @@ public class VolumeLocationsParams {
         this.collection = collection;
     }
 
-    public String toUrlParam() {
+    public String toUrlParams() {
         String result = "?";
         if (volumeId != null) {
             result = result + "volumeId=" + volumeId + "&";
         }
         if (collection != null) {
-            result = result + "collection=" + collection + "&";
+            result = result + "collection=" + collection;
         }
         return result;
     }
 
     @Override
     public String toString() {
-        return "VolumeLocationsParams{" +
+        return "LookupVolumeParams{" +
                 "volumeId='" + volumeId + '\'' +
                 ", collection='" + collection + '\'' +
                 '}';

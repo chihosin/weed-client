@@ -12,8 +12,12 @@ import org.lokra.seaweedfs.test.ConnectionManagerUtil;
  */
 public class MasterWrapperTest {
 
-    private static SeaweedfsConnectionManager manager;
-    private static MasterWrapper wrapper;
+    @Test
+    public void lookupVolume() throws Exception {
+        LookupVolumeParams params = new LookupVolumeParams("1");
+        LookupVolumeResult result = wrapper.lookupVolume(params);
+        Assert.assertEquals(params.getVolumeId().split(",")[0], result.getVolumeId());
+    }
 
     @Test
     public void forceGarbageCollection() throws Exception {
@@ -43,11 +47,13 @@ public class MasterWrapperTest {
                 Long.parseLong(String.valueOf(result.getCount())));
     }
 
+    private static MasterWrapper wrapper;
+
     @BeforeClass
     public static void setBeforeClass() throws Exception {
         ConnectionManagerUtil.startup();
         Thread.sleep(1000);
-        manager = ConnectionManagerUtil.connectionManager;
+        SeaweedfsConnectionManager manager = ConnectionManagerUtil.connectionManager;
         wrapper = new MasterWrapper(manager.getSystemConnection());
     }
 
