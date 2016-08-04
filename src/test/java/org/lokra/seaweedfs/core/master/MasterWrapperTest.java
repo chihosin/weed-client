@@ -4,6 +4,7 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.lokra.seaweedfs.SeaweedfsConnectionManager;
+import org.lokra.seaweedfs.core.MasterWrapper;
 import org.lokra.seaweedfs.core.contect.*;
 import org.lokra.seaweedfs.test.ConnectionManagerUtil;
 

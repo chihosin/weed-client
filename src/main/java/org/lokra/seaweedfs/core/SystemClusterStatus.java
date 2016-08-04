@@ -1,9 +1,6 @@
 package org.lokra.seaweedfs.core;
 
-import org.lokra.seaweedfs.core.master.MasterStatus;
-
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class SystemClusterStatus {
 

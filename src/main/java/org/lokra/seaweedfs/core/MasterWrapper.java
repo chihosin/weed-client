@@ -1,4 +1,4 @@
-package org.lokra.seaweedfs.core.master;
+package org.lokra.seaweedfs.core;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.logging.Log;
@@ -9,7 +9,6 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.util.EntityUtils;
-import org.lokra.seaweedfs.core.SystemConnection;
 import org.lokra.seaweedfs.core.contect.*;
 import org.lokra.seaweedfs.exception.SeaweedfsException;
 import org.lokra.seaweedfs.util.ServerApiStrategy;

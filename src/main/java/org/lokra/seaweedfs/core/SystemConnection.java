@@ -10,7 +10,6 @@ import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
-import org.lokra.seaweedfs.core.master.MasterStatus;
 import org.lokra.seaweedfs.core.topology.DataCenter;
 import org.lokra.seaweedfs.core.topology.DataNode;
 import org.lokra.seaweedfs.core.topology.Layout;

@@ -1,4 +1,4 @@
-package org.lokra.seaweedfs.core.volume;
+package org.lokra.seaweedfs.core;
 
 /**
  * @author Chiho Sin
