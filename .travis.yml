@@ -7,6 +7,8 @@ install:
   - weed version
 
 before_script:
+  - cd /tmp
+  - rm -rm -rf ./weed/
   - mkdir -p /tmp/weed/1 && mkdir -p /tmp/weed/2 && mkdir -p /tmp/weed/3
   - nohup weed server -master.port=9333 -ip=0.0.0.0 -dir=/tmp/weed/1 -volume.port=9443 >/dev/null 2>&1 &
   - nohup weed server -master.port=9334 -ip=0.0.0.0 -dir=/tmp/weed/2 -volume.port=9444 -master.peers=0.0.0.0:9333 >/dev/null 2>&1 &
