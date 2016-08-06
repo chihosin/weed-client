@@ -30,8 +30,6 @@ public class MasterWrapperTest {
     public void preAllocateVolumes() throws Exception {
         PreAllocateVolumesParams params = new PreAllocateVolumesParams();
         params.setCount(1);
-        params.setTtl("2m");
-        params.setReplication("000");
         PreAllocateVolumesResult result = wrapper.preAllocateVolumes(params);
         Assert.assertEquals(Long.parseLong(String.valueOf(params.getCount())),
                 Long.parseLong(String.valueOf(result.getCount())));
