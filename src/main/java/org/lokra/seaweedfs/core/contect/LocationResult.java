@@ -1,9 +1,11 @@
 package org.lokra.seaweedfs.core.contect;
 
+import org.lokra.seaweedfs.util.ConnectionUtil;
+
 /**
  * @author Chiho Sin
  */
-public class Location {
+public class LocationResult {
     private String url;
     private String publicUrl;
 
@@ -12,7 +14,7 @@ public class Location {
     }
 
     public void setUrl(String url) {
-        this.url = url;
+        this.url = ConnectionUtil.convertUrlWithScheme(url);
     }
 
     public String getPublicUrl() {
@@ -20,12 +22,12 @@ public class Location {
     }
 
     public void setPublicUrl(String publicUrl) {
-        this.publicUrl = publicUrl;
+        this.publicUrl = ConnectionUtil.convertUrlWithScheme(publicUrl);
     }
 
     @Override
     public String toString() {
-        return "Location{" +
+        return "LocationResult{" +
                 "url='" + url + '\'' +
                 ", publicUrl='" + publicUrl + '\'' +
                 '}';

@@ -38,9 +38,10 @@ public class MasterWrapper {
      * @throws IOException
      */
     public AssignFileKeyResult assignFileKey(AssignFileKeyParams params) throws IOException {
+        checkConnection();
         final String url = connection.getLeaderUrl() + ServerApiStrategy.assignFileKey + params.toUrlParams();
         HttpGet request = new HttpGet(url);
-        String json = fetchJsonResultByRequest(request);
+        String json = connection.fetchJsonResultByRequest(request);
         return objectMapper.readValue(json, AssignFileKeyResult.class);
     }
 
@@ -51,9 +52,10 @@ public class MasterWrapper {
      * @throws IOException
      */
     public void forceGarbageCollection(ForceGarbageCollectionParams params) throws IOException {
+        checkConnection();
         final String url = connection.getLeaderUrl() + ServerApiStrategy.forceGarbageCollection + params.toUrlParams();
         HttpGet request = new HttpGet(url);
-        fetchJsonResultByRequest(request);
+        connection.fetchJsonResultByRequest(request);
     }
 
     /**
@@ -64,9 +66,10 @@ public class MasterWrapper {
      * @throws IOException
      */
     public PreAllocateVolumesResult preAllocateVolumes(PreAllocateVolumesParams params) throws IOException {
+        checkConnection();
         final String url = connection.getLeaderUrl() + ServerApiStrategy.preAllocateVolumes + params.toUrlParams();
         HttpGet request = new HttpGet(url);
-        String json = fetchJsonResultByRequest(request);
+        String json = connection.fetchJsonResultByRequest(request);
         return objectMapper.readValue(json, PreAllocateVolumesResult.class);
     }
 
@@ -78,48 +81,11 @@ public class MasterWrapper {
      * @throws IOException
      */
     public LookupVolumeResult lookupVolume(LookupVolumeParams params) throws IOException {
+        checkConnection();
         final String url = connection.getLeaderUrl() + ServerApiStrategy.lookupVolume + params.toUrlParams();
         HttpGet request = new HttpGet(url);
-        String json = fetchJsonResultByRequest(request);
+        String json = connection.fetchJsonResultByRequest(request);
         return objectMapper.readValue(json, LookupVolumeResult.class);
-    }
-
-    /**
-     * Fetch http API json result.
-     *
-     * @param request
-     * @return
-     * @throws IOException
-     */
-    private String fetchJsonResultByRequest(HttpRequestBase request) throws IOException {
-        checkConnection();
-        CloseableHttpResponse response = null;
-        request.setHeader("Connection", "close");
-        String json = null;
-
-        try {
-            response = connection.getClientFromPool().execute(request, HttpClientContext.create());
-            HttpEntity entity = response.getEntity();
-            json = EntityUtils.toString(entity);
-            EntityUtils.consume(entity);
-        } finally {
-            if (response != null) {
-                try {
-                    response.close();
-                } catch (IOException ignored) {
-                }
-            }
-            request.releaseConnection();
-        }
-
-        if (json.contains("\"error\":\"")) {
-            Map map = objectMapper.readValue(json, Map.class);
-            final String errorMsg = (String) map.get("error");
-            if (errorMsg != null)
-                throw new SeaweedfsException("seaweedfs error: " + errorMsg);
-        }
-
-        return json;
     }
 
     /**

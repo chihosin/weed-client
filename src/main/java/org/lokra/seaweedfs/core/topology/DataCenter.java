@@ -1,5 +1,6 @@
 package org.lokra.seaweedfs.core.topology;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -10,7 +11,7 @@ public class DataCenter {
     private String id;
     private int free;
     private int max;
-    private Map<String, Rack> racks;
+    private List<Rack> racks;
 
     public String getId() {
         return id;
@@ -36,11 +37,11 @@ public class DataCenter {
         this.max = max;
     }
 
-    public Map<String, Rack> getRacks() {
+    public List<Rack> getRacks() {
         return racks;
     }
 
-    public void setRacks(Map<String, Rack> racks) {
+    public void setRacks(List<Rack> racks) {
         this.racks = racks;
     }
 

@@ -1,4 +1,4 @@
-package org.lokra.seaweedfs.core.master;
+package org.lokra.seaweedfs.core;
 
 import org.junit.Assert;
 import org.junit.BeforeClass;

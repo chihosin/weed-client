@@ -4,7 +4,10 @@ import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.protocol.HttpClientContext;
+import org.apache.http.impl.client.CloseableHttpClient;
 
 import java.io.IOException;
 
@@ -22,18 +25,25 @@ public class ConnectionUtil {
      * @param url    check url
      * @return When the response status code is 200, the result is true.
      */
-    public static boolean checkUriAlive(HttpClient client, String url, RequestConfig requestConfig) {
+    public static boolean checkUriAlive(CloseableHttpClient client, String url) {
+        boolean result = false;
+        CloseableHttpResponse response = null;
+        HttpGet request = new HttpGet(url);
         try {
-            final HttpGet peerRequest = new HttpGet(url);
-
-            if (requestConfig != null)
-                peerRequest.setConfig(requestConfig);
-
-            final HttpResponse response = client.execute(peerRequest);
-            return response.getStatusLine().getStatusCode() == HttpStatus.SC_OK;
+            response = client.execute(request, HttpClientContext.create());
+            result = response.getStatusLine().getStatusCode() == HttpStatus.SC_OK;
         } catch (IOException e) {
             return false;
+        } finally {
+            if (response != null) {
+                try {
+                    response.close();
+                } catch (IOException ignored) {
+                }
+            }
+            request.releaseConnection();
         }
+        return result;
     }
 
     /**

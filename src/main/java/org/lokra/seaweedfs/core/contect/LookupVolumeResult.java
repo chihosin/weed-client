@@ -8,7 +8,7 @@ import java.util.List;
 public class LookupVolumeResult {
 
     private String volumeId;
-    private List<Location> locations;
+    private List<LocationResult> locations;
 
     public String getVolumeId() {
         return volumeId;
@@ -18,11 +18,11 @@ public class LookupVolumeResult {
         this.volumeId = volumeId;
     }
 
-    public List<Location> getLocations() {
+    public List<LocationResult> getLocations() {
         return locations;
     }
 
-    public void setLocations(List<Location> locations) {
+    public void setLocations(List<LocationResult> locations) {
         this.locations = locations;
     }
 

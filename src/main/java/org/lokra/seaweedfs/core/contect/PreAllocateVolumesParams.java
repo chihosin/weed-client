@@ -9,6 +9,7 @@ public class PreAllocateVolumesParams {
     private int count;
     private String dataCenter;
     private String ttl;
+    private String collection;
 
     public PreAllocateVolumesParams() {
     }
@@ -60,6 +61,14 @@ public class PreAllocateVolumesParams {
         this.ttl = ttl;
     }
 
+    public String getCollection() {
+        return collection;
+    }
+
+    public void setCollection(String collection) {
+        this.collection = collection;
+    }
+
     public String toUrlParams() {
         String result = "?";
         if (replication != null) {
@@ -70,6 +79,9 @@ public class PreAllocateVolumesParams {
         }
         if (count > 0) {
             result = result + "count=" + Integer.toString(count) + "&";
+        }
+        if (collection != null) {
+            result = result + "collection=" + collection + "&";
         }
         if (ttl != null) {
             result = result + "ttl=" + ttl;
@@ -84,6 +96,7 @@ public class PreAllocateVolumesParams {
                 ", count=" + count +
                 ", dataCenter='" + dataCenter + '\'' +
                 ", ttl='" + ttl + '\'' +
+                ", collection='" + collection + '\'' +
                 '}';
     }
 }

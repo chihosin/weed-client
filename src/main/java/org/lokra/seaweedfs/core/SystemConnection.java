@@ -1,19 +1,20 @@
 package org.lokra.seaweedfs.core;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.http.client.ResponseHandler;
+import org.apache.http.HttpEntity;
 import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.BasicResponseHandler;
+import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
-import org.lokra.seaweedfs.core.topology.DataCenter;
-import org.lokra.seaweedfs.core.topology.DataNode;
-import org.lokra.seaweedfs.core.topology.Layout;
-import org.lokra.seaweedfs.core.topology.Rack;
+import org.apache.http.util.EntityUtils;
+import org.lokra.seaweedfs.core.topology.*;
 import org.lokra.seaweedfs.exception.SeaweedfsException;
 import org.lokra.seaweedfs.util.ConnectionUtil;
 import org.lokra.seaweedfs.util.ServerApiStrategy;
@@ -37,11 +38,9 @@ public class SystemConnection {
     private String leaderUrl;
     private int pollCycle;
     private boolean connectionClose = true;
-    private RequestConfig requestConfig;
     private SystemClusterStatus systemClusterStatus;
     private SystemTopologyStatus systemTopologyStatus;
     private PollClusterStatusThread pollClusterStatusThread;
-    private RequestConfig defaultRequestConfig = RequestConfig.DEFAULT;
     private ObjectMapper objectMapper = new ObjectMapper();
     private PoolingHttpClientConnectionManager clientConnectionManager;
     private IdleConnectionMonitorThread idleConnectionMonitorThread;
@@ -54,25 +53,21 @@ public class SystemConnection {
      * @param timeout   server connect timeout
      * @param pollCycle polls for server change cycle time
      */
-    public SystemConnection(String leaderUrl,
-                            int timeout,
-                            int pollCycle,
-                            int maxConnection,
-                            int maxConnectionsPreRoute)
+    public SystemConnection(String leaderUrl, int timeout, int pollCycle, int maxConnection, int maxConnectionsPreRoute)
             throws IOException {
         this.leaderUrl = leaderUrl;
-        this.requestConfig = RequestConfig.custom()
-                .setConnectTimeout(timeout)
-                .build();
         this.pollCycle = pollCycle;
         this.pollClusterStatusThread = new PollClusterStatusThread();
         this.idleConnectionMonitorThread = new IdleConnectionMonitorThread();
         this.clientConnectionManager = new PoolingHttpClientConnectionManager();
         this.clientConnectionManager.setMaxTotal(maxConnection);
         this.clientConnectionManager.setDefaultMaxPerRoute(maxConnectionsPreRoute);
+        final RequestConfig requestConfig = RequestConfig.custom()
+                .setConnectTimeout(timeout)
+                .build();
         this.httpClient = HttpClients.custom()
                 .setConnectionManager(this.clientConnectionManager)
-                .setDefaultRequestConfig(this.defaultRequestConfig)
+                .setDefaultRequestConfig(requestConfig)
                 .build();
     }
 
@@ -99,6 +94,7 @@ public class SystemConnection {
      *
      * @return core cluster status.
      */
+    @SuppressWarnings("unused")
     public SystemClusterStatus getSystemClusterStatus() {
         return systemClusterStatus;
     }
@@ -108,8 +104,25 @@ public class SystemConnection {
      *
      * @return core topology status.
      */
+    @SuppressWarnings("unused")
     public SystemTopologyStatus getSystemTopologyStatus() {
         return systemTopologyStatus;
+    }
+
+    /**
+     * Check volume server status
+     *
+     * @param volumeUrl
+     * @return
+     * @throws IOException
+     */
+    @SuppressWarnings({"unused", "unchecked"})
+    public VolumeStatus getVolumeStatus(String volumeUrl) throws IOException {
+        HttpGet request = new HttpGet(volumeUrl + ServerApiStrategy.checkVolumeStatus);
+        String json = fetchJsonResultByRequest(request);
+        VolumeStatus volumeStatus = objectMapper.readValue(json.replace("{}", "null"), VolumeStatus.class);
+        volumeStatus.setUrl(volumeUrl);
+        return volumeStatus;
     }
 
     /**
@@ -126,17 +139,45 @@ public class SystemConnection {
      *
      * @return core server uri
      */
-    public String getLeaderUrl() {
+    String getLeaderUrl() {
         return this.leaderUrl;
     }
 
     /**
-     * Get http client create with pool.
+     * Fetch http API json result.
      *
-     * @return Http client.
+     * @param request
+     * @return
+     * @throws IOException
      */
-    public CloseableHttpClient getClientFromPool() {
-        return httpClient;
+    String fetchJsonResultByRequest(HttpRequestBase request) throws IOException {
+        CloseableHttpResponse response = null;
+        request.setHeader("Connection", "close");
+        String json = null;
+
+        try {
+            response = httpClient.execute(request, HttpClientContext.create());
+            HttpEntity entity = response.getEntity();
+            json = EntityUtils.toString(entity);
+            EntityUtils.consume(entity);
+        } finally {
+            if (response != null) {
+                try {
+                    response.close();
+                } catch (IOException ignored) {
+                }
+            }
+            request.releaseConnection();
+        }
+
+        if (json.contains("\"error\":\"")) {
+            Map map = objectMapper.readValue(json, Map.class);
+            final String errorMsg = (String) map.get("error");
+            if (errorMsg != null)
+                throw new SeaweedfsException(errorMsg);
+        }
+
+        return json;
     }
 
     /**
@@ -147,48 +188,43 @@ public class SystemConnection {
      */
     @SuppressWarnings("unchecked")
     private SystemClusterStatus fetchSystemClusterStatus(String masterUrl) throws IOException {
-        CloseableHttpClient httpClient = HttpClients.createDefault();
         MasterStatus leader;
-        HashMap<String, MasterStatus> peers;
+        ArrayList<MasterStatus> peers;
         final HttpGet request = new HttpGet(masterUrl + ServerApiStrategy.checkClusterStatus);
-        request.setConfig(defaultRequestConfig);
-        final ResponseHandler<String> responseHandler = new BasicResponseHandler();
-        final String response = httpClient.execute(request, responseHandler);
-        Map map = objectMapper.readValue(response, Map.class);
+        final String json = fetchJsonResultByRequest(request);
+        Map map = objectMapper.readValue(json, Map.class);
 
         if (map.get("Leader") != null) {
-            leader = new MasterStatus(ConnectionUtil.convertUrlWithScheme((String) map.get("Leader")));
+            leader = new MasterStatus((String) map.get("Leader"));
         } else {
-            httpClient.close();
             throw new SeaweedfsException("not found seaweedfs core leader");
         }
 
-        peers = new HashMap<String, MasterStatus>();
+        peers = new ArrayList<MasterStatus>();
 
         if (map.get("Peers") != null) {
             List<String> rawPeerList = (List<String>) map.get("Peers");
             for (String url : rawPeerList) {
-                MasterStatus peer = new MasterStatus(ConnectionUtil.convertUrlWithScheme(url));
-                peers.put(peer.getUrl(), peer);
+                MasterStatus peer = new MasterStatus(url);
+                peers.add(peer);
             }
         }
 
         if (map.get("IsLeader") == null || !((Boolean) map.get("IsLeader"))) {
-            peers.put(masterUrl, new MasterStatus(masterUrl));
-            peers.remove(leader.getUrl());
+            peers.add(new MasterStatus(masterUrl.replace("http://", "")));
+            peers.remove(leader);
             leader.setActive(
-                    ConnectionUtil.checkUriAlive(httpClient, leader.getUrl(), this.requestConfig));
+                    ConnectionUtil.checkUriAlive(this.httpClient, leader.getUrl()));
             if (!leader.isActive())
                 throw new SeaweedfsException("seaweedfs core leader is failover");
         } else {
             leader.setActive(true);
         }
 
-        for (String url : peers.keySet()) {
-            peers.get(url).setActive(ConnectionUtil.checkUriAlive(httpClient, url, this.requestConfig));
+        for (MasterStatus item : peers) {
+            item.setActive(ConnectionUtil.checkUriAlive(this.httpClient, item.getUrl()));
         }
 
-        httpClient.close();
         return new SystemClusterStatus(leader, peers);
 
     }
@@ -199,34 +235,26 @@ public class SystemConnection {
      * @param peers peers core server
      * @return If not found the leader, result is null.
      */
-    private String findLeaderUriByPeers(Map<String, MasterStatus> peers) throws IOException {
+    private String findLeaderUriByPeers(List<MasterStatus> peers) throws IOException {
         if (peers == null || peers.size() == 0)
             return null;
         else {
-            CloseableHttpClient httpClient = HttpClients.createDefault();
-            try {
-                String result;
-                for (String uri : peers.keySet()) {
-                    final HttpGet request = new HttpGet(uri + ServerApiStrategy.checkClusterStatus);
-                    request.setConfig(defaultRequestConfig);
-                    final ResponseHandler<String> responseHandler = new BasicResponseHandler();
-                    String response;
-                    Map responseMap;
-                    try {
-                        response = httpClient.execute(request, responseHandler);
-                        responseMap = objectMapper.readValue(response, Map.class);
-                    } catch (IOException e) {
-                        continue;
-                    }
-                    if (responseMap.get("Leader") != null) {
-                        result = ConnectionUtil.convertUrlWithScheme((String) responseMap.get("Leader"));
-
-                        if (ConnectionUtil.checkUriAlive(httpClient, result, this.requestConfig))
-                            return result;
-                    }
+            String result;
+            for (MasterStatus item : peers) {
+                final HttpGet request = new HttpGet(item.getUrl() + ServerApiStrategy.checkClusterStatus);
+                Map responseMap;
+                try {
+                    final String json = fetchJsonResultByRequest(request);
+                    responseMap = objectMapper.readValue(json, Map.class);
+                } catch (IOException e) {
+                    continue;
                 }
-            } finally {
-                httpClient.close();
+                if (responseMap.get("Leader") != null) {
+                    result = ConnectionUtil.convertUrlWithScheme((String) responseMap.get("Leader"));
+
+                    if (ConnectionUtil.checkUriAlive(this.httpClient, result))
+                        return result;
+                }
             }
         }
         return null;
@@ -240,15 +268,12 @@ public class SystemConnection {
      */
     @SuppressWarnings("unchecked")
     private SystemTopologyStatus fetchSystemTopologyStatus(String masterUrl) throws IOException {
-        CloseableHttpClient httpClient = HttpClients.createDefault();
         final HttpGet request = new HttpGet(masterUrl + ServerApiStrategy.checkTopologyStatus);
-        request.setConfig(defaultRequestConfig);
-        final ResponseHandler<String> responseHandler = new BasicResponseHandler();
-        final String response = httpClient.execute(request, responseHandler);
-        Map map = objectMapper.readValue(response, Map.class);
+        final String json = fetchJsonResultByRequest(request);
+        Map map = objectMapper.readValue(json, Map.class);
 
         // Fetch data center from json
-        Map<String, DataCenter> dataCenters = new HashMap<String, DataCenter>();
+        List<DataCenter> dataCenters = new ArrayList<DataCenter>();
         ArrayList<Map<String, Object>> rawDcs =
                 ((ArrayList<Map<String, Object>>) ((Map) (map.get("Topology"))).get("DataCenters"));
         if (rawDcs != null)
@@ -258,7 +283,7 @@ public class SystemConnection {
                 dc.setId((String) rawDc.get("Id"));
                 dc.setMax((Integer) rawDc.get("Max"));
 
-                Map<String, Rack> racks = new HashMap<String, Rack>();
+                List<Rack> racks = new ArrayList<Rack>();
                 ArrayList<Map<String, Object>> rawRks =
                         ((ArrayList<Map<String, Object>>) (rawDc.get("Racks")));
                 if (rawRks != null)
@@ -268,7 +293,7 @@ public class SystemConnection {
                         rk.setId((String) rawRk.get("Id"));
                         rk.setFree((Integer) rawRk.get("Free"));
 
-                        Map<String, DataNode> dataNodes = new HashMap<String, DataNode>();
+                        List<DataNode> dataNodes = new ArrayList<DataNode>();
                         ArrayList<Map<String, Object>> rawDns =
                                 ((ArrayList<Map<String, Object>>) (rawRk.get("DataNodes")));
 
@@ -280,13 +305,13 @@ public class SystemConnection {
                                 dn.setVolumes((Integer) rawDn.get("Volumes"));
                                 dn.setUrl((String) rawDn.get("Url"));
                                 dn.setPubilcUrl((String) rawDn.get("PublicUrl"));
-                                dataNodes.put(dn.getUrl(), dn);
+                                dataNodes.add(dn);
                             }
                         rk.setDataNodes(dataNodes);
-                        racks.put(rk.getId(), rk);
+                        racks.add(rk);
                     }
                 dc.setRacks(racks);
-                dataCenters.put(dc.getId(), dc);
+                dataCenters.add(dc);
             }
 
         // Fetch data layout
@@ -399,9 +424,8 @@ public class SystemConnection {
                 while (!shutdown) {
                     synchronized (this) {
                         wait(pollCycle);
-                        // 关闭无效连接
+                        // Close free connection
                         clientConnectionManager.closeExpiredConnections();
-                        // 关闭空闲超过30秒的
                         clientConnectionManager.closeIdleConnections(30, TimeUnit.SECONDS);
                         log.debug("http client pool state [" + clientConnectionManager.getTotalStats().toString() + "]");
                     }

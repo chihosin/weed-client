@@ -1,5 +1,7 @@
 package org.lokra.seaweedfs.core.topology;
 
+import org.lokra.seaweedfs.util.ConnectionUtil;
+
 /**
  * @author Chiho Sin
  */
@@ -16,7 +18,7 @@ public class DataNode {
     }
 
     public void setUrl(String url) {
-        this.url = url;
+        this.url = ConnectionUtil.convertUrlWithScheme(url);
     }
 
     public String getPubilcUrl() {
@@ -24,7 +26,7 @@ public class DataNode {
     }
 
     public void setPubilcUrl(String pubilcUrl) {
-        this.pubilcUrl = pubilcUrl;
+        this.pubilcUrl = ConnectionUtil.convertUrlWithScheme(pubilcUrl);
     }
 
     public int getVolumes() {

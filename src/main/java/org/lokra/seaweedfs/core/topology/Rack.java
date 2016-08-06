@@ -1,7 +1,6 @@
 package org.lokra.seaweedfs.core.topology;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentMap;
+import java.util.List;
 
 /**
  * @author Chiho Sin
@@ -11,7 +10,7 @@ public class Rack {
     private String id;
     private int free;
     private int max;
-    private Map<String, DataNode> dataNodes;
+    private List<DataNode> dataNodes;
 
     public String getId() {
         return id;
@@ -37,11 +36,11 @@ public class Rack {
         this.max = max;
     }
 
-    public Map<String, DataNode> getDataNodes() {
+    public List<DataNode> getDataNodes() {
         return dataNodes;
     }
 
-    public void setDataNodes(Map<String, DataNode> dataNodes) {
+    public void setDataNodes(List<DataNode> dataNodes) {
         this.dataNodes = dataNodes;
     }
 

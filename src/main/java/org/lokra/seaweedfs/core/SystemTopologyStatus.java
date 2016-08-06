@@ -17,13 +17,13 @@ public class SystemTopologyStatus {
     private int max;
     private int free;
     private String version;
-    private Map<String, DataCenter> dataCenters;
+    private List<DataCenter> dataCenters;
     private List<Layout> layouts;
 
     public SystemTopologyStatus() {
     }
 
-    public SystemTopologyStatus(int max, int free, Map<String, DataCenter> dataCenters, List<Layout> layouts) {
+    public SystemTopologyStatus(int max, int free, List<DataCenter> dataCenters, List<Layout> layouts) {
         this.max = max;
         this.free = free;
         this.dataCenters = dataCenters;
@@ -46,11 +46,11 @@ public class SystemTopologyStatus {
         this.free = free;
     }
 
-    public Map<String, DataCenter> getDataCenters() {
+    public List<DataCenter> getDataCenters() {
         return dataCenters;
     }
 
-    public void setDataCenters(Map<String, DataCenter> dataCenters) {
+    public void setDataCenters(List<DataCenter> dataCenters) {
         this.dataCenters = dataCenters;
     }
 

@@ -1,21 +1,24 @@
 package org.lokra.seaweedfs.core;
 
+import org.lokra.seaweedfs.core.topology.MasterStatus;
+
+import java.util.List;
 import java.util.Map;
 
 public class SystemClusterStatus {
 
     private MasterStatus leader;
-    private Map<String, MasterStatus> peers;
+    private List<MasterStatus> peers;
     private int total;
     private int available;
 
-    public SystemClusterStatus(MasterStatus leader, Map<String, MasterStatus> peers) {
+    public SystemClusterStatus(MasterStatus leader, List<MasterStatus> peers) {
         this.leader = leader;
         this.peers = peers;
         this.total = peers.size() + 1;
         this.available = 1;
-        for (String key : peers.keySet()) {
-            if (peers.get(key).isActive()) {
+        for (MasterStatus item : peers) {
+            if (item.isActive()) {
                 this.available++;
             }
         }
@@ -35,7 +38,7 @@ public class SystemClusterStatus {
         return leader;
     }
 
-    public Map<String, MasterStatus> getPeers() {
+    public List<MasterStatus> getPeers() {
         return peers;
     }
 

@@ -1,5 +1,7 @@
 package org.lokra.seaweedfs.core.contect;
 
+import org.lokra.seaweedfs.util.ConnectionUtil;
+
 /**
  * @author Chiho Sin
  */
@@ -31,7 +33,7 @@ public class AssignFileKeyResult {
     }
 
     public void setUrl(String url) {
-        this.url = url;
+        this.url = ConnectionUtil.convertUrlWithScheme(url);
     }
 
     public String getPublicUrl() {
@@ -39,7 +41,7 @@ public class AssignFileKeyResult {
     }
 
     public void setPublicUrl(String publicUrl) {
-        this.publicUrl = publicUrl;
+        this.publicUrl = ConnectionUtil.convertUrlWithScheme(publicUrl);
     }
 
     @Override

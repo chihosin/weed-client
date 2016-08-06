@@ -13,21 +13,16 @@ public class SeaweedfsConnectionManagerTest {
 
     private static SeaweedfsConnectionManager manager;
 
-    @Test
-    public void getSystemConnection() throws Exception {
-        Assert.assertFalse(manager.getSystemConnection().isConnectionClose());
-    }
-
-    @BeforeClass
-    public static void setBeforeClass() throws Exception {
-        ConnectionManagerUtil.startup();
-        Thread.sleep(6000);
-        manager = ConnectionManagerUtil.connectionManager;
-    }
-
-    @AfterClass
-    public static void tearAfterClass() throws Exception {
-        ConnectionManagerUtil.shutdown();
-    }
+//    @Test
+//    public void getSystemConnection() throws Exception {
+//        Assert.assertFalse(manager.getSystemConnection().isConnectionClose());
+//    }
+//
+//    @BeforeClass
+//    public static void setBeforeClass() throws Exception {
+//        ConnectionManagerUtil.startup();
+//        Thread.sleep(6000);
+//        manager = ConnectionManagerUtil.connectionManager;
+//    }
 
 }

@@ -1,5 +1,7 @@
-package org.lokra.seaweedfs.core;
+package org.lokra.seaweedfs.core.topology;
 
+
+import org.lokra.seaweedfs.util.ConnectionUtil;
 
 /**
  * @author Chiho Sin
@@ -10,7 +12,7 @@ public class MasterStatus {
     private boolean isActive;
 
     public MasterStatus(String url) {
-        this.url = url;
+        this.url = ConnectionUtil.convertUrlWithScheme(url);
     }
 
     public String getUrl() {
@@ -18,7 +20,7 @@ public class MasterStatus {
     }
 
     public void setUrl(String url) {
-        this.url = url;
+        this.url = ConnectionUtil.convertUrlWithScheme(url);
     }
 
     public boolean isActive() {
@@ -35,5 +37,16 @@ public class MasterStatus {
                 "url=" + url +
                 ", isActive=" + isActive +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        MasterStatus that = (MasterStatus) o;
+
+        return url.equals(that.url);
+
     }
 }

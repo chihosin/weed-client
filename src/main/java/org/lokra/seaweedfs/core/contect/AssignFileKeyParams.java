@@ -9,6 +9,7 @@ public class AssignFileKeyParams {
     private int count;
     private String dataCenter;
     private String ttl;
+    private String collection;
 
     public AssignFileKeyParams() {
     }
@@ -60,6 +61,14 @@ public class AssignFileKeyParams {
         this.ttl = ttl;
     }
 
+    public String getCollection() {
+        return collection;
+    }
+
+    public void setCollection(String collection) {
+        this.collection = collection;
+    }
+
     public String toUrlParams() {
         String result = "?";
         if (replication != null) {
@@ -67,6 +76,9 @@ public class AssignFileKeyParams {
         }
         if (dataCenter != null) {
             result = result + "dataCenter=" + dataCenter + "&";
+        }
+        if (collection != null) {
+            result = result + "collection=" + collection + "&";
         }
         if (count > 0) {
             result = result + "count=" + Integer.toString(count) + "&";
@@ -84,6 +96,7 @@ public class AssignFileKeyParams {
                 ", count=" + count +
                 ", dataCenter='" + dataCenter + '\'' +
                 ", ttl='" + ttl + '\'' +
+                ", collection='" + collection + '\'' +
                 '}';
     }
 }
