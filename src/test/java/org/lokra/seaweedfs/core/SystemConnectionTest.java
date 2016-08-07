@@ -3,13 +3,7 @@ package org.lokra.seaweedfs.core;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.lokra.seaweedfs.SeaweedfsConnectionManager;
-import org.lokra.seaweedfs.core.topology.DataCenter;
 import org.lokra.seaweedfs.test.ConnectionManagerUtil;
-
-import java.util.Map;
-
-import static org.junit.Assert.*;
 
 /**
  * @author Chiho Sin

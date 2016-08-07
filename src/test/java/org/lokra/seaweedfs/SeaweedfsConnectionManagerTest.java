@@ -1,10 +1,6 @@
 package org.lokra.seaweedfs;
 
-import org.junit.AfterClass;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.lokra.seaweedfs.test.ConnectionManagerUtil;
+import org.lokra.seaweedfs.core.SeaweedfsConnectionManager;
 
 /**
  * @author Chiho Sin

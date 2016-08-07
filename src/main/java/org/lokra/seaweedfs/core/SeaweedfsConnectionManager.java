@@ -1,10 +1,7 @@
-package org.lokra.seaweedfs;
+package org.lokra.seaweedfs.core;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.lokra.seaweedfs.core.SystemConnection;
-import org.lokra.seaweedfs.core.MasterWrapper;
-import org.lokra.seaweedfs.core.VolumeWrapper;
 import org.lokra.seaweedfs.util.ConnectionUtil;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;

@@ -3,15 +3,12 @@ package org.lokra.seaweedfs.core;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.lokra.seaweedfs.SeaweedfsConnectionManager;
 import org.lokra.seaweedfs.core.contect.AssignFileKeyParams;
 import org.lokra.seaweedfs.core.contect.AssignFileKeyResult;
 import org.lokra.seaweedfs.test.ConnectionManagerUtil;
 
 import java.io.File;
 import java.io.FileInputStream;
-
-import static org.junit.Assert.*;
 
 /**
  * @author Chiho Sin

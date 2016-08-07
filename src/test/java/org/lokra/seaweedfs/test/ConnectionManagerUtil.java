@@ -1,6 +1,6 @@
 package org.lokra.seaweedfs.test;
 
-import org.lokra.seaweedfs.SeaweedfsConnectionManager;
+import org.lokra.seaweedfs.core.SeaweedfsConnectionManager;
 
 import java.io.IOException;
 
