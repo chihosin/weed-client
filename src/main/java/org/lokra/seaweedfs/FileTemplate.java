@@ -3,8 +3,8 @@ package org.lokra.seaweedfs;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.entity.ContentType;
-import org.lokra.seaweedfs.cache.HeaderCache;
-import org.lokra.seaweedfs.cache.StreamCache;
+import org.lokra.seaweedfs.core.HeaderResponse;
+import org.lokra.seaweedfs.core.StreamResponse;
 import org.lokra.seaweedfs.core.*;
 import org.lokra.seaweedfs.core.contect.*;
 import org.lokra.seaweedfs.exception.*;
@@ -228,7 +228,7 @@ public class FileTemplate implements InitializingBean, DisposableBean {
      * @param fileId file id.
      * @return File stream cache in jvm.
      */
-    public StreamCache getFileStream(String fileId) throws IOException {
+    public StreamResponse getFileStream(String fileId) throws IOException {
         final String targetUrl = getTargetUrl(fileId);
         return volumeWrapper.getFileStream(targetUrl, fileId);
     }
@@ -242,17 +242,17 @@ public class FileTemplate implements InitializingBean, DisposableBean {
      */
     public FileHandleStatus getFileStatus(String fileId) throws IOException {
         final String targetUrl = getTargetUrl(fileId);
-        HeaderCache headerCache = volumeWrapper.getFileStatus(targetUrl, fileId);
+        HeaderResponse headerResponse = volumeWrapper.getFileStatus(targetUrl, fileId);
         try {
             return new FileHandleStatus(fileId,
-                    headerDateFormat.parse(headerCache.getLastHeader("Last-Modified").getValue()).getTime(),
-                    headerCache.getLastHeader("Content-Disposition").getValue()
-                            .substring(10, headerCache.getLastHeader("Content-Disposition").getValue().length() - 1),
-                    headerCache.getLastHeader("Content-Type").getValue(),
-                    Long.parseLong(headerCache.getLastHeader("Content-Length").getValue()));
+                    headerDateFormat.parse(headerResponse.getLastHeader("Last-Modified").getValue()).getTime(),
+                    headerResponse.getLastHeader("Content-Disposition").getValue()
+                            .substring(10, headerResponse.getLastHeader("Content-Disposition").getValue().length() - 1),
+                    headerResponse.getLastHeader("Content-Type").getValue(),
+                    Long.parseLong(headerResponse.getLastHeader("Content-Length").getValue()));
         } catch (ParseException e) {
             throw new SeaweedfsException("Could not parse last modified time [" +
-                    headerCache.getLastHeader("Last-Modified").getValue() + "] to long value");
+                    headerResponse.getLastHeader("Last-Modified").getValue() + "] to long value");
         }
     }
 

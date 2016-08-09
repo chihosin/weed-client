@@ -3,9 +3,7 @@ package org.lokra.seaweedfs.core;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.http.Header;
 import org.apache.http.HttpEntity;
-import org.apache.http.StatusLine;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -16,8 +14,6 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.util.EntityUtils;
-import org.lokra.seaweedfs.cache.HeaderCache;
-import org.lokra.seaweedfs.cache.StreamCache;
 import org.lokra.seaweedfs.core.topology.*;
 import org.lokra.seaweedfs.exception.SeaweedfsException;
 import org.lokra.seaweedfs.util.ConnectionUtil;
@@ -25,7 +21,6 @@ import org.lokra.seaweedfs.util.RequestPathStrategy;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -218,15 +213,15 @@ public class SystemConnection {
      * @return
      * @throws IOException
      */
-    StreamCache fetchStreamCacheByRequest(HttpRequestBase request) throws IOException {
+    StreamResponse fetchStreamCacheByRequest(HttpRequestBase request) throws IOException {
         CloseableHttpResponse response = null;
         request.setHeader("Connection", "close");
-        StreamCache cache;
+        StreamResponse cache;
 
         try {
             response = httpClient.execute(request, HttpClientContext.create());
             HttpEntity entity = response.getEntity();
-            cache = new StreamCache(entity.getContent(), response.getStatusLine().getStatusCode());
+            cache = new StreamResponse(entity.getContent(), response.getStatusLine().getStatusCode());
             EntityUtils.consume(entity);
         } finally {
             if (response != null) {
@@ -247,14 +242,14 @@ public class SystemConnection {
      * @return
      * @throws IOException
      */
-    HeaderCache fetchHeaderByRequest(HttpHead request) throws IOException {
+    HeaderResponse fetchHeaderByRequest(HttpHead request) throws IOException {
         CloseableHttpResponse response = null;
         request.setHeader("Connection", "close");
-        HeaderCache headerCache;
+        HeaderResponse headerResponse;
 
         try {
             response = httpClient.execute(request, HttpClientContext.create());
-            headerCache = new HeaderCache(response.getAllHeaders(), response.getStatusLine().getStatusCode());
+            headerResponse = new HeaderResponse(response.getAllHeaders(), response.getStatusLine().getStatusCode());
         } finally {
             if (response != null) {
                 try {
@@ -264,7 +259,7 @@ public class SystemConnection {
             }
             request.releaseConnection();
         }
-        return headerCache;
+        return headerResponse;
     }
 
     /**

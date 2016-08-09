@@ -1,17 +1,17 @@
-package org.lokra.seaweedfs.cache;
+package org.lokra.seaweedfs.core;
 
 import java.io.*;
 
 /**
  * @author Chiho Sin
  */
-public class StreamCache {
+public class StreamResponse {
 
     private ByteArrayOutputStream byteArrayOutputStream;
     private int httpResponseStatusCode;
     private long length = 0;
 
-    public StreamCache(InputStream inputStream, int httpResponseStatusCode) throws IOException {
+    public StreamResponse(InputStream inputStream, int httpResponseStatusCode) throws IOException {
         this.httpResponseStatusCode = httpResponseStatusCode;
         if (inputStream == null)
             return;
@@ -47,7 +47,7 @@ public class StreamCache {
 
     @Override
     public String toString() {
-        return "StreamCache{" +
+        return "StreamResponse{" +
                 "byteArrayOutputStream=" + byteArrayOutputStream +
                 ", httpResponseStatusCode=" + httpResponseStatusCode +
                 ", length=" + length +

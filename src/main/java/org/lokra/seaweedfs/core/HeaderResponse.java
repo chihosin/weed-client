@@ -1,4 +1,4 @@
-package org.lokra.seaweedfs.cache;
+package org.lokra.seaweedfs.core;
 
 import org.apache.http.Header;
 
@@ -7,12 +7,12 @@ import java.util.Arrays;
 /**
  * @author Chiho Sin
  */
-public class HeaderCache {
+public class HeaderResponse {
 
     private Header[] headers;
     private int httpResponseStatusCode;
 
-    public HeaderCache(Header[] headers, int httpResponseStatusCode) {
+    public HeaderResponse(Header[] headers, int httpResponseStatusCode) {
         this.httpResponseStatusCode = httpResponseStatusCode;
         if (headers == null)
             return;
@@ -45,7 +45,7 @@ public class HeaderCache {
 
     @Override
     public String toString() {
-        return "HeaderCache{" +
+        return "HeaderResponse{" +
                 "headers=" + Arrays.toString(headers) +
                 ", httpResponseStatusCode=" + httpResponseStatusCode +
                 '}';

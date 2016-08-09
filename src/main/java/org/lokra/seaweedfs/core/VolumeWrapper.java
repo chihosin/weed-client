@@ -11,17 +11,12 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
-import org.lokra.seaweedfs.cache.HeaderCache;
-import org.lokra.seaweedfs.cache.StreamCache;
 import org.lokra.seaweedfs.exception.SeaweedfsException;
 import org.lokra.seaweedfs.exception.SeaweedfsFileNotFoundException;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.text.SimpleDateFormat;
-import java.util.Locale;
 import java.util.Map;
-import java.util.TimeZone;
 
 /**
  * @author Chiho Sin
@@ -108,9 +103,9 @@ public class VolumeWrapper {
      * @return
      * @throws IOException
      */
-    public StreamCache getFileStream(String url, String fid) throws IOException {
+    public StreamResponse getFileStream(String url, String fid) throws IOException {
         HttpGet request = new HttpGet(url + "/" + fid);
-        StreamCache cache = connection.fetchStreamCacheByRequest(request);
+        StreamResponse cache = connection.fetchStreamCacheByRequest(request);
         convertResponseStatusToException(cache.getHttpResponseStatusCode(), url, fid, false, false, false, false);
         return cache;
     }
@@ -123,9 +118,9 @@ public class VolumeWrapper {
      * @return
      * @throws IOException
      */
-    public HeaderCache getFileStatus(String url, String fid) throws IOException {
+    public HeaderResponse getFileStatus(String url, String fid) throws IOException {
         HttpHead request = new HttpHead(url + "/" + fid);
-        HeaderCache cache = connection.fetchHeaderByRequest(request);
+        HeaderResponse cache = connection.fetchHeaderByRequest(request);
         convertResponseStatusToException(cache.getHttpResponseStatusCode(), url, fid, false, false, false, false);
         return cache;
     }

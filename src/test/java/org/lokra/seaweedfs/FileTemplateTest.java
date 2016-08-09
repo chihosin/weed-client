@@ -1,14 +1,9 @@
 package org.lokra.seaweedfs;
 
-import okhttp3.ConnectionPool;
-import okhttp3.OkHttpClient;
-import org.apache.http.entity.ContentType;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.lokra.seaweedfs.cache.StreamCache;
 import org.lokra.seaweedfs.core.FileHandleStatus;
-import org.lokra.seaweedfs.FileTemplate;
 import org.lokra.seaweedfs.test.ConnectionManagerUtil;
 
 import java.io.*;

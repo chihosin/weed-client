@@ -5,7 +5,6 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.lokra.seaweedfs.FileSystemManager;
-import org.lokra.seaweedfs.cache.StreamCache;
 import org.lokra.seaweedfs.core.contect.AssignFileKeyParams;
 import org.lokra.seaweedfs.core.contect.AssignFileKeyResult;
 import org.lokra.seaweedfs.test.ConnectionManagerUtil;
@@ -42,7 +41,7 @@ public class VolumeWrapperTest {
                 null,
                 ContentType.DEFAULT_BINARY);
 
-        StreamCache cache = volumeWrapper.getFileStream(result.getUrl(), result.getFid());
+        StreamResponse cache = volumeWrapper.getFileStream(result.getUrl(), result.getFid());
         Assert.assertTrue(cache.getOutputStream().toString().equals("@getFileContent"));
     }
 
