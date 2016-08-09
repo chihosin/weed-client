@@ -32,4 +32,23 @@ public class LocationResult {
                 ", publicUrl='" + publicUrl + '\'' +
                 '}';
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof LocationResult)) return false;
+
+        LocationResult that = (LocationResult) o;
+
+        if (!url.equals(that.url)) return false;
+        return publicUrl.equals(that.publicUrl);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = url.hashCode();
+        result = 31 * result + publicUrl.hashCode();
+        return result;
+    }
 }

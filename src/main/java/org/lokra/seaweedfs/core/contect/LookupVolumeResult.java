@@ -26,6 +26,14 @@ public class LookupVolumeResult {
         this.locations = locations;
     }
 
+    public LocationResult getRandomLocation() {
+        if (locations != null) {
+            return locations.get(((int) (Math.random() * locations.size())));
+        } else {
+            return null;
+        }
+    }
+
     @Override
     public String toString() {
         return "LookupVolumeResult{" +

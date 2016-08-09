@@ -1,23 +1,27 @@
 package org.lokra.seaweedfs.core;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.http.Header;
 import org.apache.http.HttpEntity;
+import org.apache.http.StatusLine;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpHead;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.util.EntityUtils;
+import org.lokra.seaweedfs.cache.HeaderCache;
+import org.lokra.seaweedfs.cache.StreamCache;
 import org.lokra.seaweedfs.core.topology.*;
 import org.lokra.seaweedfs.exception.SeaweedfsException;
 import org.lokra.seaweedfs.util.ConnectionUtil;
-import org.lokra.seaweedfs.util.ServerApiStrategy;
+import org.lokra.seaweedfs.util.RequestPathStrategy;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -118,9 +122,10 @@ public class SystemConnection {
      */
     @SuppressWarnings({"unused", "unchecked"})
     public VolumeStatus getVolumeStatus(String volumeUrl) throws IOException {
-        HttpGet request = new HttpGet(volumeUrl + ServerApiStrategy.checkVolumeStatus);
-        String json = fetchJsonResultByRequest(request);
-        VolumeStatus volumeStatus = objectMapper.readValue(json.replace("{}", "null"), VolumeStatus.class);
+        HttpGet request = new HttpGet(volumeUrl + RequestPathStrategy.checkVolumeStatus);
+        JsonResponse jsonResponse = fetchJsonResultByRequest(request);
+        VolumeStatus volumeStatus = objectMapper.readValue(
+                jsonResponse.json.replace("{}", "null"), VolumeStatus.class);
         volumeStatus.setUrl(volumeUrl);
         return volumeStatus;
     }
@@ -150,15 +155,15 @@ public class SystemConnection {
      * @return
      * @throws IOException
      */
-    String fetchJsonResultByRequest(HttpRequestBase request) throws IOException {
+    JsonResponse fetchJsonResultByRequest(HttpRequestBase request) throws IOException {
         CloseableHttpResponse response = null;
         request.setHeader("Connection", "close");
-        String json = null;
+        JsonResponse jsonResponse = null;
 
         try {
             response = httpClient.execute(request, HttpClientContext.create());
             HttpEntity entity = response.getEntity();
-            json = EntityUtils.toString(entity);
+            jsonResponse = new JsonResponse(EntityUtils.toString(entity), response.getStatusLine().getStatusCode());
             EntityUtils.consume(entity);
         } finally {
             if (response != null) {
@@ -170,14 +175,105 @@ public class SystemConnection {
             request.releaseConnection();
         }
 
-        if (json.contains("\"error\":\"")) {
-            Map map = objectMapper.readValue(json, Map.class);
+        if (jsonResponse.json.contains("\"error\":\"")) {
+            Map map = objectMapper.readValue(jsonResponse.json, Map.class);
             final String errorMsg = (String) map.get("error");
             if (errorMsg != null)
                 throw new SeaweedfsException(errorMsg);
         }
 
-        return json;
+        return jsonResponse;
+    }
+
+    /**
+     * Fetch http API status code.
+     *
+     * @param request Only http method head.
+     * @return
+     * @throws IOException
+     */
+    int fetchStatusCodeByRequest(HttpHead request) throws IOException {
+        CloseableHttpResponse response = null;
+        request.setHeader("Connection", "close");
+        int statusCode;
+        try {
+            response = httpClient.execute(request, HttpClientContext.create());
+            statusCode = response.getStatusLine().getStatusCode();
+        } finally {
+            if (response != null) {
+                try {
+                    response.close();
+                } catch (IOException ignored) {
+                }
+            }
+            request.releaseConnection();
+        }
+        return statusCode;
+    }
+
+    /**
+     * Fetch http API input stream cache.
+     *
+     * @param request
+     * @return
+     * @throws IOException
+     */
+    StreamCache fetchStreamCacheByRequest(HttpRequestBase request) throws IOException {
+        CloseableHttpResponse response = null;
+        request.setHeader("Connection", "close");
+        StreamCache cache;
+
+        try {
+            response = httpClient.execute(request, HttpClientContext.create());
+            HttpEntity entity = response.getEntity();
+            cache = new StreamCache(entity.getContent(), response.getStatusLine().getStatusCode());
+            EntityUtils.consume(entity);
+        } finally {
+            if (response != null) {
+                try {
+                    response.close();
+                } catch (IOException ignored) {
+                }
+            }
+            request.releaseConnection();
+        }
+        return cache;
+    }
+
+    /**
+     * Fetch http API hearers with status code(in array).
+     *
+     * @param request
+     * @return
+     * @throws IOException
+     */
+    HeaderCache fetchHeaderByRequest(HttpHead request) throws IOException {
+        CloseableHttpResponse response = null;
+        request.setHeader("Connection", "close");
+        HeaderCache headerCache;
+
+        try {
+            response = httpClient.execute(request, HttpClientContext.create());
+            headerCache = new HeaderCache(response.getAllHeaders(), response.getStatusLine().getStatusCode());
+        } finally {
+            if (response != null) {
+                try {
+                    response.close();
+                } catch (IOException ignored) {
+                }
+            }
+            request.releaseConnection();
+        }
+        return headerCache;
+    }
+
+    /**
+     * Get closeable http client from pool.
+     *
+     * @return Closeable http client.
+     */
+    protected CloseableHttpClient getCloseableHttpClientFromPool() {
+        return this.httpClient;
     }
 
     /**
@@ -190,9 +286,9 @@ public class SystemConnection {
     private SystemClusterStatus fetchSystemClusterStatus(String masterUrl) throws IOException {
         MasterStatus leader;
         ArrayList<MasterStatus> peers;
-        final HttpGet request = new HttpGet(masterUrl + ServerApiStrategy.checkClusterStatus);
-        final String json = fetchJsonResultByRequest(request);
-        Map map = objectMapper.readValue(json, Map.class);
+        final HttpGet request = new HttpGet(masterUrl + RequestPathStrategy.checkClusterStatus);
+        final JsonResponse jsonResponse = fetchJsonResultByRequest(request);
+        Map map = objectMapper.readValue(jsonResponse.json, Map.class);
 
         if (map.get("Leader") != null) {
             leader = new MasterStatus((String) map.get("Leader"));
@@ -241,11 +337,11 @@ public class SystemConnection {
         else {
             String result;
             for (MasterStatus item : peers) {
-                final HttpGet request = new HttpGet(item.getUrl() + ServerApiStrategy.checkClusterStatus);
+                final HttpGet request = new HttpGet(item.getUrl() + RequestPathStrategy.checkClusterStatus);
                 Map responseMap;
                 try {
-                    final String json = fetchJsonResultByRequest(request);
-                    responseMap = objectMapper.readValue(json, Map.class);
+                    final JsonResponse jsonResponse = fetchJsonResultByRequest(request);
+                    responseMap = objectMapper.readValue(jsonResponse.json, Map.class);
                 } catch (IOException e) {
                     continue;
                 }
@@ -268,9 +364,9 @@ public class SystemConnection {
      */
     @SuppressWarnings("unchecked")
     private SystemTopologyStatus fetchSystemTopologyStatus(String masterUrl) throws IOException {
-        final HttpGet request = new HttpGet(masterUrl + ServerApiStrategy.checkTopologyStatus);
-        final String json = fetchJsonResultByRequest(request);
-        Map map = objectMapper.readValue(json, Map.class);
+        final HttpGet request = new HttpGet(masterUrl + RequestPathStrategy.checkTopologyStatus);
+        final JsonResponse jsonResponse = fetchJsonResultByRequest(request);
+        Map map = objectMapper.readValue(jsonResponse.json, Map.class);
 
         // Fetch data center from json
         List<DataCenter> dataCenters = new ArrayList<DataCenter>();

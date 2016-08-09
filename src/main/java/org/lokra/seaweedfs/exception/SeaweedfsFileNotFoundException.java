@@ -1,7 +1,7 @@
 package org.lokra.seaweedfs.exception;
 
 /**
- * Created by ChihoSin on 16/7/22.
+ * @author Chiho Sin
  */
 public class SeaweedfsFileNotFoundException extends SeaweedfsException {
 

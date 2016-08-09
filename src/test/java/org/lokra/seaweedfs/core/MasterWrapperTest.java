@@ -3,6 +3,7 @@ package org.lokra.seaweedfs.core;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.lokra.seaweedfs.FileSystemManager;
 import org.lokra.seaweedfs.core.contect.*;
 import org.lokra.seaweedfs.test.ConnectionManagerUtil;
 
@@ -36,9 +37,9 @@ public class MasterWrapperTest {
     @Test
     public void assignFileKey() throws Exception {
         AssignFileKeyParams params = new AssignFileKeyParams();
-        params.setReplication("000");
-        params.setCount(2);
-        params.setTtl("2m");
+        params.setReplication("001");
+        params.setCollection("test");
+        params.setCount(1);
         AssignFileKeyResult result = wrapper.assignFileKey(params);
         Assert.assertEquals(Long.parseLong(String.valueOf(params.getCount())),
                 Long.parseLong(String.valueOf(result.getCount())));
@@ -50,7 +51,7 @@ public class MasterWrapperTest {
     public static void setBeforeClass() throws Exception {
         ConnectionManagerUtil.startup();
         Thread.sleep(1000);
-        SeaweedfsConnectionManager manager = ConnectionManagerUtil.connectionManager;
+        FileSystemManager manager = ConnectionManagerUtil.connectionManager;
         wrapper = new MasterWrapper(manager.getSystemConnection());
     }
 

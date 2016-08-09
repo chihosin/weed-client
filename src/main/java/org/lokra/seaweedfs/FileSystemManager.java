@@ -1,7 +1,10 @@
-package org.lokra.seaweedfs.core;
+package org.lokra.seaweedfs;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.lokra.seaweedfs.core.MasterWrapper;
+import org.lokra.seaweedfs.core.SystemConnection;
+import org.lokra.seaweedfs.core.VolumeWrapper;
 import org.lokra.seaweedfs.util.ConnectionUtil;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
@@ -13,9 +16,9 @@ import java.io.IOException;
  *
  * @author Chiho Sin
  */
-public class SeaweedfsConnectionManager implements InitializingBean, DisposableBean {
+public class FileSystemManager implements InitializingBean, DisposableBean {
 
-    private static final Log log = LogFactory.getLog(SeaweedfsConnectionManager.class);
+    private static final Log log = LogFactory.getLog(FileSystemManager.class);
 
     private String host = "localhost";
     private int port = 9333;
@@ -29,7 +32,7 @@ public class SeaweedfsConnectionManager implements InitializingBean, DisposableB
     private MasterWrapper masterWrapper;
     private VolumeWrapper volumeWrapper;
 
-    public SeaweedfsConnectionManager() {
+    public FileSystemManager() {
     }
 
     public SystemConnection getSystemConnection() {

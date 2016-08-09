@@ -1,6 +1,6 @@
 package org.lokra.seaweedfs.test;
 
-import org.lokra.seaweedfs.core.SeaweedfsConnectionManager;
+import org.lokra.seaweedfs.FileSystemManager;
 
 import java.io.IOException;
 
@@ -9,12 +9,12 @@ import java.io.IOException;
  */
 public class ConnectionManagerUtil {
 
-    public static SeaweedfsConnectionManager connectionManager;
+    public static FileSystemManager connectionManager;
 
     static {
-        connectionManager = new SeaweedfsConnectionManager();
+        connectionManager = new FileSystemManager();
         connectionManager.setHost("0.0.0.0");
-        connectionManager.setPort(9335);
+        connectionManager.setPort(9333);
         connectionManager.setPollCycle(5000);
         connectionManager.setTimeout(800);
     }

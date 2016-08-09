@@ -3,7 +3,7 @@ package org.lokra.seaweedfs.exception;
 import java.io.IOException;
 
 /**
- * Created by ChihoSin on 16/7/22.
+ * @author Chiho Sin
  */
 public class SeaweedfsException extends IOException {
 

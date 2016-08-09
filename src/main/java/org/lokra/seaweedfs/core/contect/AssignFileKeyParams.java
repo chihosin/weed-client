@@ -14,19 +14,12 @@ public class AssignFileKeyParams {
     public AssignFileKeyParams() {
     }
 
-    public AssignFileKeyParams(String dataCenter) {
-        this.dataCenter = dataCenter;
-    }
-
-    public AssignFileKeyParams(int count) {
-        this.count = count;
-    }
-
-    public AssignFileKeyParams(String replication, int count, String dataCenter, String ttl) {
+    public AssignFileKeyParams(String replication, int count, String dataCenter, String ttl, String collection) {
         this.replication = replication;
         this.count = count;
         this.dataCenter = dataCenter;
         this.ttl = ttl;
+        this.collection = collection;
     }
 
     public String getReplication() {
@@ -99,4 +92,5 @@ public class AssignFileKeyParams {
                 ", collection='" + collection + '\'' +
                 '}';
     }
+
 }

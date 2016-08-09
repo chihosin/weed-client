@@ -1,13 +1,11 @@
 package org.lokra.seaweedfs;
 
-import org.lokra.seaweedfs.core.SeaweedfsConnectionManager;
-
 /**
  * @author Chiho Sin
  */
-public class SeaweedfsConnectionManagerTest {
+public class FileSystemManagerTest {
 
-    private static SeaweedfsConnectionManager manager;
+    private static FileSystemManager manager;
 
 //    @Test
 //    public void getSystemConnection() throws Exception {

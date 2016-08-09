@@ -3,18 +3,12 @@ package org.lokra.seaweedfs.core;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.http.HttpEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpRequestBase;
-import org.apache.http.client.protocol.HttpClientContext;
-import org.apache.http.util.EntityUtils;
 import org.lokra.seaweedfs.core.contect.*;
 import org.lokra.seaweedfs.exception.SeaweedfsException;
-import org.lokra.seaweedfs.util.ServerApiStrategy;
+import org.lokra.seaweedfs.util.RequestPathStrategy;
 
 import java.io.IOException;
-import java.util.Map;
 
 /**
  * @author Chiho Sin
@@ -39,10 +33,10 @@ public class MasterWrapper {
      */
     public AssignFileKeyResult assignFileKey(AssignFileKeyParams params) throws IOException {
         checkConnection();
-        final String url = connection.getLeaderUrl() + ServerApiStrategy.assignFileKey + params.toUrlParams();
+        final String url = connection.getLeaderUrl() + RequestPathStrategy.assignFileKey + params.toUrlParams();
         HttpGet request = new HttpGet(url);
-        String json = connection.fetchJsonResultByRequest(request);
-        return objectMapper.readValue(json, AssignFileKeyResult.class);
+        JsonResponse jsonResponse = connection.fetchJsonResultByRequest(request);
+        return objectMapper.readValue(jsonResponse.json, AssignFileKeyResult.class);
     }
 
     /**
@@ -53,7 +47,7 @@ public class MasterWrapper {
      */
     public void forceGarbageCollection(ForceGarbageCollectionParams params) throws IOException {
         checkConnection();
-        final String url = connection.getLeaderUrl() + ServerApiStrategy.forceGarbageCollection + params.toUrlParams();
+        final String url = connection.getLeaderUrl() + RequestPathStrategy.forceGarbageCollection + params.toUrlParams();
         HttpGet request = new HttpGet(url);
         connection.fetchJsonResultByRequest(request);
     }
@@ -67,10 +61,10 @@ public class MasterWrapper {
      */
     public PreAllocateVolumesResult preAllocateVolumes(PreAllocateVolumesParams params) throws IOException {
         checkConnection();
-        final String url = connection.getLeaderUrl() + ServerApiStrategy.preAllocateVolumes + params.toUrlParams();
+        final String url = connection.getLeaderUrl() + RequestPathStrategy.preAllocateVolumes + params.toUrlParams();
         HttpGet request = new HttpGet(url);
-        String json = connection.fetchJsonResultByRequest(request);
-        return objectMapper.readValue(json, PreAllocateVolumesResult.class);
+        JsonResponse jsonResponse = connection.fetchJsonResultByRequest(request);
+        return objectMapper.readValue(jsonResponse.json, PreAllocateVolumesResult.class);
     }
 
     /**
@@ -82,10 +76,10 @@ public class MasterWrapper {
      */
     public LookupVolumeResult lookupVolume(LookupVolumeParams params) throws IOException {
         checkConnection();
-        final String url = connection.getLeaderUrl() + ServerApiStrategy.lookupVolume + params.toUrlParams();
+        final String url = connection.getLeaderUrl() + RequestPathStrategy.lookupVolume + params.toUrlParams();
         HttpGet request = new HttpGet(url);
-        String json = connection.fetchJsonResultByRequest(request);
-        return objectMapper.readValue(json, LookupVolumeResult.class);
+        JsonResponse jsonResponse = connection.fetchJsonResultByRequest(request);
+        return objectMapper.readValue(jsonResponse.json, LookupVolumeResult.class);
     }
 
     /**
