@@ -1,5 +1,7 @@
 package org.lokra.seaweedfs;
 
+import org.junit.Test;
+
 /**
  * @author Chiho Sin
  */

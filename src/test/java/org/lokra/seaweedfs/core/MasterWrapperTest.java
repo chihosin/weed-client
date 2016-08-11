@@ -16,7 +16,7 @@ public class MasterWrapperTest {
     public void lookupVolume() throws Exception {
         LookupVolumeParams params = new LookupVolumeParams("1");
         LookupVolumeResult result = wrapper.lookupVolume(params);
-        Assert.assertEquals(params.getVolumeId().split(",")[0], result.getVolumeId());
+        Assert.assertEquals(params.getVolumeId(), result.getVolumeId());
     }
 
     @Test

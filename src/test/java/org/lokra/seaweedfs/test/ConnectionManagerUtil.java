@@ -15,8 +15,7 @@ public class ConnectionManagerUtil {
         connectionManager = new FileSystemManager();
         connectionManager.setHost("0.0.0.0");
         connectionManager.setPort(9333);
-        connectionManager.setPollCycle(5000);
-        connectionManager.setTimeout(800);
+        connectionManager.setEnableLookupVolumeCache(true);
     }
 
     public static void startup() throws IOException {

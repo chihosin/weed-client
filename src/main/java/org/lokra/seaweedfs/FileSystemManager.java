@@ -2,9 +2,7 @@ package org.lokra.seaweedfs;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.lokra.seaweedfs.core.MasterWrapper;
 import org.lokra.seaweedfs.core.SystemConnection;
-import org.lokra.seaweedfs.core.VolumeWrapper;
 import org.lokra.seaweedfs.util.ConnectionUtil;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
@@ -23,17 +21,16 @@ public class FileSystemManager implements InitializingBean, DisposableBean {
     private String host = "localhost";
     private int port = 9333;
     private int timeout = 10000;
-    private int pollCycle = 30000;
-    private int maxConnection = 300;
-    private int maxConnectionsPreRoute = 3000;
+    private int statusExpiry = 30;
+    private int maxConnection = 100;
+    private int idleConnectionExpiry = 30;
+    private int maxConnectionsPreRoute = 1000;
+    private boolean enableLookupVolumeCache = false;
+    private int lookupVolumeCacheExpiry = 120;
+    private int lookupVolumeCacheCount = 100;
     private boolean startup = false;
 
     private SystemConnection systemConnection;
-    private MasterWrapper masterWrapper;
-    private VolumeWrapper volumeWrapper;
-
-    public FileSystemManager() {
-    }
 
     public SystemConnection getSystemConnection() {
         return systemConnection;
@@ -52,9 +49,13 @@ public class FileSystemManager implements InitializingBean, DisposableBean {
                 this.systemConnection = new SystemConnection(
                         ConnectionUtil.convertUrlWithScheme(host + ":" + port),
                         this.timeout,
-                        this.pollCycle,
+                        this.statusExpiry,
+                        this.idleConnectionExpiry,
                         this.maxConnection,
-                        this.maxConnectionsPreRoute);
+                        this.maxConnectionsPreRoute,
+                        this.enableLookupVolumeCache,
+                        this.lookupVolumeCacheExpiry,
+                        this.lookupVolumeCacheCount);
             }
             this.systemConnection.startup();
             this.startup = true;
@@ -114,12 +115,12 @@ public class FileSystemManager implements InitializingBean, DisposableBean {
         this.timeout = timeout;
     }
 
-    public int getPollCycle() {
-        return pollCycle;
+    public int getStatusExpiry() {
+        return statusExpiry;
     }
 
-    public void setPollCycle(int pollCycle) {
-        this.pollCycle = pollCycle;
+    public void setStatusExpiry(int statusExpiry) {
+        this.statusExpiry = statusExpiry;
     }
 
     public int getMaxConnection() {
@@ -136,5 +137,37 @@ public class FileSystemManager implements InitializingBean, DisposableBean {
 
     public void setMaxConnectionsPreRoute(int maxConnectionsPreRoute) {
         this.maxConnectionsPreRoute = maxConnectionsPreRoute;
+    }
+
+    public boolean isEnableLookupVolumeCache() {
+        return enableLookupVolumeCache;
+    }
+
+    public void setEnableLookupVolumeCache(boolean enableLookupVolumeCache) {
+        this.enableLookupVolumeCache = enableLookupVolumeCache;
+    }
+
+    public int getLookupVolumeCacheExpiry() {
+        return lookupVolumeCacheExpiry;
+    }
+
+    public void setLookupVolumeCacheExpiry(int lookupVolumeCacheExpiry) {
+        this.lookupVolumeCacheExpiry = lookupVolumeCacheExpiry;
+    }
+
+    public int getIdleConnectionExpiry() {
+        return idleConnectionExpiry;
+    }
+
+    public void setIdleConnectionExpiry(int idleConnectionExpiry) {
+        this.idleConnectionExpiry = idleConnectionExpiry;
+    }
+
+    public int getLookupVolumeCacheCount() {
+        return lookupVolumeCacheCount;
+    }
+
+    public void setLookupVolumeCacheCount(int lookupVolumeCacheCount) {
+        this.lookupVolumeCacheCount = lookupVolumeCacheCount;
     }
 }

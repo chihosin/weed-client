@@ -7,14 +7,14 @@ import java.util.List;
  */
 public class LookupVolumeResult {
 
-    private String volumeId;
+    private long volumeId;
     private List<LocationResult> locations;
 
-    public String getVolumeId() {
+    public long getVolumeId() {
         return volumeId;
     }
 
-    public void setVolumeId(String volumeId) {
+    public void setVolumeId(long volumeId) {
         this.volumeId = volumeId;
     }
 

@@ -14,6 +14,13 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.util.EntityUtils;
+import org.ehcache.CacheManager;
+import org.ehcache.config.builders.CacheConfigurationBuilder;
+import org.ehcache.config.builders.CacheManagerBuilder;
+import org.ehcache.config.builders.ResourcePoolsBuilder;
+import org.ehcache.expiry.Duration;
+import org.ehcache.expiry.Expirations;
+import org.lokra.seaweedfs.core.contect.LookupVolumeResult;
 import org.lokra.seaweedfs.core.topology.*;
 import org.lokra.seaweedfs.exception.SeaweedfsException;
 import org.lokra.seaweedfs.util.ConnectionUtil;
@@ -32,11 +39,17 @@ import java.util.concurrent.TimeUnit;
  */
 public class SystemConnection {
 
+    public static final String LOOKUP_VOLUME_CACHE_ALIAS = "lookupVolumeCache";
+
     private static final Log log = LogFactory.getLog(SystemConnection.class);
 
     private String leaderUrl;
-    private int pollCycle;
+    private int statusExpiry;
     private boolean connectionClose = true;
+    private boolean enableLookupVolumeCache;
+    private int lookupVolumeCacheExpiry;
+    private int lookupVolumeCacheCount;
+    private int idleConnectionExpiry;
     private SystemClusterStatus systemClusterStatus;
     private SystemTopologyStatus systemTopologyStatus;
     private PollClusterStatusThread pollClusterStatusThread;
@@ -44,18 +57,25 @@ public class SystemConnection {
     private PoolingHttpClientConnectionManager clientConnectionManager;
     private IdleConnectionMonitorThread idleConnectionMonitorThread;
     private CloseableHttpClient httpClient;
+    private CacheManager cacheManager = null;
 
     /**
      * Constructor.
      *
-     * @param leaderUrl initial leader uri
-     * @param timeout   server connect timeout
-     * @param pollCycle polls for server change cycle time
+     * @param leaderUrl    initial leader uri
+     * @param timeout      server connect timeout
+     * @param statusExpiry polls for server change cycle time
      */
-    public SystemConnection(String leaderUrl, int timeout, int pollCycle, int maxConnection, int maxConnectionsPreRoute)
+    public SystemConnection(String leaderUrl, int timeout, int statusExpiry, int idleConnectionExpiry,
+                            int maxConnection, int maxConnectionsPreRoute, boolean enableLookupVolumeCache,
+                            int lookupVolumeCacheExpiry, int lookupVolumeCacheCount)
             throws IOException {
         this.leaderUrl = leaderUrl;
-        this.pollCycle = pollCycle;
+        this.statusExpiry = statusExpiry;
+        this.idleConnectionExpiry = idleConnectionExpiry;
+        this.enableLookupVolumeCache = enableLookupVolumeCache;
+        this.lookupVolumeCacheExpiry = lookupVolumeCacheExpiry;
+        this.lookupVolumeCacheCount = lookupVolumeCacheCount;
         this.pollClusterStatusThread = new PollClusterStatusThread();
         this.idleConnectionMonitorThread = new IdleConnectionMonitorThread();
         this.clientConnectionManager = new PoolingHttpClientConnectionManager();
@@ -75,6 +95,7 @@ public class SystemConnection {
      */
     public void startup() {
         log.info("core connection is startup now");
+        initCache();
         this.pollClusterStatusThread.start();
         this.idleConnectionMonitorThread.start();
     }
@@ -84,6 +105,7 @@ public class SystemConnection {
      */
     public void stop() {
         log.info("core connection is shutdown now");
+        closeCache();
         this.pollClusterStatusThread.shutdown();
         this.idleConnectionMonitorThread.shutdown();
     }
@@ -132,6 +154,15 @@ public class SystemConnection {
      */
     public boolean isConnectionClose() {
         return connectionClose;
+    }
+
+    /**
+     * Get cache manager.
+     *
+     * @return {@code null} if no such cache exists.
+     */
+    CacheManager getCacheManager() {
+        return cacheManager;
     }
 
     /**
@@ -435,6 +466,32 @@ public class SystemConnection {
     }
 
     /**
+     * Init cache manager and cache mapping.
+     */
+    private void initCache() {
+        if (enableLookupVolumeCache) {
+            CacheManagerBuilder builder = CacheManagerBuilder.newCacheManagerBuilder();
+            this.cacheManager = builder.build(true);
+            if (enableLookupVolumeCache)
+                this.cacheManager.createCache(LOOKUP_VOLUME_CACHE_ALIAS,
+                        CacheConfigurationBuilder.newCacheConfigurationBuilder(Long.class, LookupVolumeResult.class,
+                                ResourcePoolsBuilder.heap(this.lookupVolumeCacheCount))
+                                .withExpiry(Expirations.timeToLiveExpiration(
+                                        Duration.of(this.lookupVolumeCacheExpiry, TimeUnit.SECONDS))).build());
+        }
+    }
+
+    /**
+     * Close all cache and close cache manager.
+     */
+    private void closeCache() {
+        if (cacheManager != null) {
+            cacheManager.removeCache(LOOKUP_VOLUME_CACHE_ALIAS);
+            cacheManager.close();
+        }
+    }
+
+    /**
      * Thread for cycle to check cluster status.
      */
     private class PollClusterStatusThread extends Thread {
@@ -444,41 +501,42 @@ public class SystemConnection {
         @Override
         public void run() {
             while (!shutdown) {
+                synchronized (this) {
+                    try {
+                        fetchSystemStatus(leaderUrl);
+                        connectionClose = false;
+                    } catch (IOException e) {
+                        connectionClose = true;
+                        log.error("unable connect to the target seaweedfs core [" + leaderUrl + "]");
+                    }
 
-                try {
-                    fetchSystemStatus(leaderUrl);
-                    connectionClose = false;
-                } catch (IOException e) {
-                    connectionClose = true;
-                    log.error("unable connect to the target seaweedfs core [" + leaderUrl + "]");
-                }
-
-                try {
-                    if (connectionClose) {
-                        log.info("lookup seaweedfs core leader by peers");
-                        if (systemClusterStatus == null || systemClusterStatus.getPeers().size() == 0) {
-                            log.error("cloud not found the seaweedfs core peers");
-                        } else {
-                            String url = findLeaderUriByPeers(systemClusterStatus.getPeers());
-                            if (url != null) {
-                                log.error("seaweedfs core cluster is failover");
-                                fetchSystemStatus(url);
-                                connectionClose = false;
+                    try {
+                        if (connectionClose) {
+                            log.info("lookup seaweedfs core leader by peers");
+                            if (systemClusterStatus == null || systemClusterStatus.getPeers().size() == 0) {
+                                log.error("cloud not found the seaweedfs core peers");
                             } else {
-                                log.error("seaweedfs core cluster is down");
-                                systemClusterStatus.getLeader().setActive(false);
-                                connectionClose = true;
+                                String url = findLeaderUriByPeers(systemClusterStatus.getPeers());
+                                if (url != null) {
+                                    log.error("seaweedfs core cluster is failover");
+                                    fetchSystemStatus(url);
+                                    connectionClose = false;
+                                } else {
+                                    log.error("seaweedfs core cluster is down");
+                                    systemClusterStatus.getLeader().setActive(false);
+                                    connectionClose = true;
+                                }
                             }
                         }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        log.error("unable connect to the seaweedfs core leader");
                     }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    log.error("unable connect to the seaweedfs core leader");
-                }
 
-                try {
-                    Thread.sleep(pollCycle);
-                } catch (InterruptedException ignored) {
+                    try {
+                        Thread.sleep(statusExpiry * 1000);
+                    } catch (InterruptedException ignored) {
+                    }
                 }
             }
         }
@@ -514,10 +572,10 @@ public class SystemConnection {
             try {
                 while (!shutdown) {
                     synchronized (this) {
-                        wait(pollCycle);
+                        wait(statusExpiry);
                         // Close free connection
                         clientConnectionManager.closeExpiredConnections();
-                        clientConnectionManager.closeIdleConnections(30, TimeUnit.SECONDS);
+                        clientConnectionManager.closeIdleConnections(idleConnectionExpiry, TimeUnit.SECONDS);
                         log.debug("http client pool state [" + clientConnectionManager.getTotalStats().toString() + "]");
                     }
                 }
