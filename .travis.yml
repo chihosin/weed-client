@@ -5,7 +5,7 @@ install:
   - wget https://bintray.com/chrislusf/seaweedfs/download_file?file_path=go_0.70_amd64.deb -O weed.deb
   - sudo dpkg -i weed.deb
   - weed version
-  - weed server
+  - weed server &
 
 script:
   - gradle test -i
