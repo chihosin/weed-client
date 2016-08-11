@@ -6,7 +6,7 @@ services:
 
 before_install:
   - docker build -t weed .
-  - docker run -d -P --name weed weed server -master.port=9333 -volume.port=8080 -dir="./data"
+  - docker run -d -p 127.0.0.1:8080:8080 -p 127.0.0.1:9333:9333 --name weed weed server -master.port=9333 -volume.port=8080 -dir="./data"
   - docker ps -a
 
 script:
