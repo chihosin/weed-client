@@ -9,9 +9,9 @@ install:
 before_script:
   - sudo mkdir -p /tmp/weed/1 && sudo mkdir -p /tmp/weed/2 && sudo mkdir -p /tmp/weed/3
   - sudo chmod a+wrx -R /tmp/
-  - sudo nohup weed server -master.port=9333 -ip=0.0.0.0 -dir=/tmp/weed/1 -volume.port=8080 >/dev/null 2>&1 &
-  - sudo nohup weed server -master.port=9334 -ip=0.0.0.0 -dir=/tmp/weed/2 -volume.port=8081 -master.peers=0.0.0.0:9333 >/dev/null 2>&1 &
-  - sudo nohup weed server -master.port=9335 -ip=0.0.0.0 -dir=/tmp/weed/3 -volume.port=8082 -master.peers=0.0.0.0:9334 >/dev/null 2>&1 &
+  - nohup sudo weed server -master.port=9333 -ip=0.0.0.0 -dir=/tmp/weed/1 -volume.port=8080 >/dev/null 2>&1 &
+  - nohup sudo weed server -master.port=9334 -ip=0.0.0.0 -dir=/tmp/weed/2 -volume.port=8081 -master.peers=0.0.0.0:9333 >/dev/null 2>&1 &
+  - nohup sudo weed server -master.port=9335 -ip=0.0.0.0 -dir=/tmp/weed/3 -volume.port=8082 -master.peers=0.0.0.0:9334 >/dev/null 2>&1 &
 
 script:
   - gradle test -i
