@@ -44,7 +44,6 @@ public class FileTemplateTest {
         ConnectionManagerUtil.startup();
         Thread.sleep(1000);
         template = new FileTemplate(ConnectionManagerUtil.connectionManager.getSystemConnection());
-        template.setSameRackCount(1);
         template.setCollection("test");
     }
 
