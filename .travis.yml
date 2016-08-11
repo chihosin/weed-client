@@ -15,4 +15,4 @@ before_script:
   - nohup weed server -master.port=9335 -ip=0.0.0.0 -dir=/home/travis/build/lokra-platform/seaweedfs-client/data/volume/3 -volume.port=8082 -master.peers=0.0.0.0:9334 >/dev/null 2>&1 &
 
 script:
-  - gradle test -i
+  - gradle build
