@@ -37,13 +37,14 @@ public class FileSystemManagerTest {
     @BeforeClass
     public static void setBeforeClass() throws Exception {
         ConnectionManagerUtil.startup();
-        Thread.sleep(6000);
         manager = ConnectionManagerUtil.connectionManager;
     }
 
     @Test
     public void getSystemConnection() throws Exception {
         Assert.assertFalse(manager.getSystemConnection().isConnectionClose());
+        System.out.println("System Cluster:\n" + manager.getSystemConnection().getSystemClusterStatus());
+        System.out.println("System Topology:\n" + manager.getSystemConnection().getSystemTopologyStatus());
     }
 
 }

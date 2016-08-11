@@ -39,8 +39,11 @@ public class ConnectionManagerUtil {
         connectionManager.setPort(9333);
     }
 
-    public static void startup() throws IOException {
-        connectionManager.startup();
+    public static void startup() throws IOException, InterruptedException {
+        if (connectionManager.getSystemConnection() == null) {
+            connectionManager.startup();
+            Thread.sleep(3000);
+        }
     }
 
     public static void shutdown() {

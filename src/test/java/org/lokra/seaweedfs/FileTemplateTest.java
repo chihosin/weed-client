@@ -42,8 +42,9 @@ public class FileTemplateTest {
     @BeforeClass
     public static void setBeforeClass() throws Exception {
         ConnectionManagerUtil.startup();
-        Thread.sleep(6000);
         template = new FileTemplate(ConnectionManagerUtil.connectionManager.getSystemConnection());
+        template.setCollection("Test");
+        template.setSameRackCount(1);
     }
 
     @Test
@@ -112,7 +113,7 @@ public class FileTemplateTest {
     public void updateFileByStream() throws Exception {
         FileHandleStatus status = template.saveFileByStream("test.txt",
                 new ByteArrayInputStream("@saveFileByStream".getBytes()));
-        FileHandleStatus updateStatus = template.updateFileByStream(
+        template.updateFileByStream(
                 status.getFileId(), "test.txt", new ByteArrayInputStream("@updateFileByStream".getBytes()));
     }
 
