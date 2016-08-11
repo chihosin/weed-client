@@ -43,8 +43,6 @@ public class FileTemplateTest {
     public static void setBeforeClass() throws Exception {
         ConnectionManagerUtil.startup();
         template = new FileTemplate(ConnectionManagerUtil.connectionManager.getSystemConnection());
-        template.setCollection("Test");
-        template.setSameRackCount(1);
     }
 
     @Test
