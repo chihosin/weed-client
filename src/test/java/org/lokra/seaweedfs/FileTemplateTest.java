@@ -42,9 +42,8 @@ public class FileTemplateTest {
     @BeforeClass
     public static void setBeforeClass() throws Exception {
         ConnectionManagerUtil.startup();
-        Thread.sleep(1000);
+        Thread.sleep(6000);
         template = new FileTemplate(ConnectionManagerUtil.connectionManager.getSystemConnection());
-        template.setCollection("test");
     }
 
     @Test
