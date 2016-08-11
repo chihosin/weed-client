@@ -10,6 +10,7 @@ RUN \
   mkdir ./bin &&  mv ./*/* ./bin && \
   mkdir -p /opt/weed/v1 /opt/weed/v2 /opt/weed/v3 && \
   chmod +x ./bin/weed && \
+  ls -lrt /opt/weed && \
   nohup /opt/weed/bin/weed server -master.port=9333 -ip=0.0.0.0 -dir=/opt/weed/v1 -volume.port=9443 >/dev/null 2>&1 & \
   nohup /opt/weed/bin/weed server -master.port=9334 -ip=0.0.0.0 -dir=/opt/weed/v2 -volume.port=9444 -master.peers=0.0.0.0:9333 >/dev/null 2>&1 & \
   nohup /opt/weed/bin/weed server -master.port=9335 -ip=0.0.0.0 -dir=/opt/weed/v3 -volume.port=9445 -master.peers=0.0.0.0:9334 >/dev/null 2>&1 &
