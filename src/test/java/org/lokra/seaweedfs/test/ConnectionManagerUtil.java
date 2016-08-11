@@ -35,7 +35,7 @@ public class ConnectionManagerUtil {
 
     static {
         connectionManager = new FileSystemManager();
-        connectionManager.setHost("0.0.0.0");
+        connectionManager.setHost("127.0.0.1");
         connectionManager.setPort(9333);
     }
 
