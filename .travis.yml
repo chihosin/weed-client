@@ -5,8 +5,8 @@ services:
   - docker
 
 install:
-  - docker build -t weed .
+  - docker build -it weed .
   - docker run -d -p 0.0.0.0:8080:8080 -p 0.0.0.0:9333:9333 --name weed weed server -master.port=9333 -ip=0.0.0.0 -volume.port=8080
 
 script:
-  - gradle test
+  - gradle -i test
