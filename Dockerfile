@@ -15,7 +15,11 @@ RUN \
   nohup ./bin/weed server -master.port=9335 -ip=0.0.0.0 -dir=/opt/weed/v3 -volume.port=9445 -master.peers=0.0.0.0:9334
 
 EXPOSE 9443
+EXPOSE 9444
+EXPOSE 9445
 EXPOSE 9333
+EXPOSE 9334
+EXPOSE 9335
 
 VOLUME /data
 
