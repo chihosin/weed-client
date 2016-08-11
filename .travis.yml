@@ -6,7 +6,7 @@ services:
 
 install:
   - docker build -t weed .
-  - docker run -d -p 0.0.0.0:8080:8080 -p 0.0.0.0:9333:9333 --name weed weed server -master.port=9333 -master.volumeSizeLimitMB=2 -volume.port=8080
+  - docker run -d -p 0.0.0.0:8080:8080 -p 0.0.0.0:9333:9333 --name weed weed server -master.port=9333 -dir=/data -volume.port=8080
 
 script:
   - gradle -i test
