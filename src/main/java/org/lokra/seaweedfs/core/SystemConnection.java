@@ -1,9 +1,32 @@
+/*
+ * Copyright (c) 2016 Lokra Platform
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package org.lokra.seaweedfs.core;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpEntity;
+import org.apache.http.client.cache.HttpCacheStorage;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -12,6 +35,8 @@ import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.client.cache.CacheConfig;
+import org.apache.http.impl.client.cache.CachingHttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.util.EntityUtils;
 import org.ehcache.CacheManager;
@@ -39,17 +64,22 @@ import java.util.concurrent.TimeUnit;
  */
 public class SystemConnection {
 
-    public static final String LOOKUP_VOLUME_CACHE_ALIAS = "lookupVolumeCache";
+    static final String LOOKUP_VOLUME_CACHE_ALIAS = "lookupVolumeCache";
 
     private static final Log log = LogFactory.getLog(SystemConnection.class);
 
     private String leaderUrl;
-    private int statusExpiry;
+    private long statusExpiry;
+    private int connectionTimeout;
     private boolean connectionClose = true;
+    private boolean enableFileStreamCache;
+    private int fileStreamCacheEntries;
+    private long fileStreamCacheSize;
+    private HttpCacheStorage fileStreamCacheStorage;
     private boolean enableLookupVolumeCache;
-    private int lookupVolumeCacheExpiry;
-    private int lookupVolumeCacheCount;
-    private int idleConnectionExpiry;
+    private long lookupVolumeCacheExpiry;
+    private int lookupVolumeCacheEntries;
+    private long idleConnectionExpiry;
     private SystemClusterStatus systemClusterStatus;
     private SystemTopologyStatus systemTopologyStatus;
     private PollClusterStatusThread pollClusterStatusThread;
@@ -61,33 +91,29 @@ public class SystemConnection {
 
     /**
      * Constructor.
-     *
-     * @param leaderUrl    initial leader uri
-     * @param timeout      server connect timeout
-     * @param statusExpiry polls for server change cycle time
      */
-    public SystemConnection(String leaderUrl, int timeout, int statusExpiry, int idleConnectionExpiry,
+    public SystemConnection(String leaderUrl, int connectionTimeout, long statusExpiry, long idleConnectionExpiry,
                             int maxConnection, int maxConnectionsPreRoute, boolean enableLookupVolumeCache,
-                            int lookupVolumeCacheExpiry, int lookupVolumeCacheCount)
+                            long lookupVolumeCacheExpiry, int lookupVolumeCacheEntries,
+                            boolean enableFileStreamCache, int fileStreamCacheEntries, long fileStreamCacheSize,
+                            HttpCacheStorage fileStreamCacheStorage)
             throws IOException {
         this.leaderUrl = leaderUrl;
         this.statusExpiry = statusExpiry;
+        this.connectionTimeout = connectionTimeout;
         this.idleConnectionExpiry = idleConnectionExpiry;
         this.enableLookupVolumeCache = enableLookupVolumeCache;
         this.lookupVolumeCacheExpiry = lookupVolumeCacheExpiry;
-        this.lookupVolumeCacheCount = lookupVolumeCacheCount;
+        this.lookupVolumeCacheEntries = lookupVolumeCacheEntries;
         this.pollClusterStatusThread = new PollClusterStatusThread();
         this.idleConnectionMonitorThread = new IdleConnectionMonitorThread();
         this.clientConnectionManager = new PoolingHttpClientConnectionManager();
         this.clientConnectionManager.setMaxTotal(maxConnection);
         this.clientConnectionManager.setDefaultMaxPerRoute(maxConnectionsPreRoute);
-        final RequestConfig requestConfig = RequestConfig.custom()
-                .setConnectTimeout(timeout)
-                .build();
-        this.httpClient = HttpClients.custom()
-                .setConnectionManager(this.clientConnectionManager)
-                .setDefaultRequestConfig(requestConfig)
-                .build();
+        this.enableFileStreamCache = enableFileStreamCache;
+        this.fileStreamCacheEntries = fileStreamCacheEntries;
+        this.fileStreamCacheSize = fileStreamCacheSize;
+        this.fileStreamCacheStorage = fileStreamCacheStorage;
     }
 
     /**
@@ -95,6 +121,35 @@ public class SystemConnection {
      */
     public void startup() {
         log.info("core connection is startup now");
+        final RequestConfig requestConfig = RequestConfig.custom()
+                .setConnectTimeout(this.connectionTimeout)
+                .build();
+        if (this.enableFileStreamCache) {
+            if (this.fileStreamCacheStorage == null) {
+                final CacheConfig cacheConfig = CacheConfig.custom()
+                        .setMaxCacheEntries(this.fileStreamCacheEntries)
+                        .setMaxObjectSize(this.fileStreamCacheSize)
+                        .setHeuristicCachingEnabled(true)
+                        .setHeuristicCoefficient(0.8f)
+                        .build();
+                this.httpClient = CachingHttpClients.custom()
+                        .setCacheConfig(cacheConfig)
+                        .setConnectionManager(this.clientConnectionManager)
+                        .setDefaultRequestConfig(requestConfig)
+                        .build();
+            } else {
+                this.httpClient = CachingHttpClients.custom()
+                        .setHttpCacheStorage(this.fileStreamCacheStorage)
+                        .setConnectionManager(this.clientConnectionManager)
+                        .setDefaultRequestConfig(requestConfig)
+                        .build();
+            }
+        } else {
+            this.httpClient = HttpClients.custom()
+                    .setConnectionManager(this.clientConnectionManager)
+                    .setDefaultRequestConfig(requestConfig)
+                    .build();
+        }
         initCache();
         this.pollClusterStatusThread.start();
         this.idleConnectionMonitorThread.start();
@@ -475,7 +530,7 @@ public class SystemConnection {
             if (enableLookupVolumeCache)
                 this.cacheManager.createCache(LOOKUP_VOLUME_CACHE_ALIAS,
                         CacheConfigurationBuilder.newCacheConfigurationBuilder(Long.class, LookupVolumeResult.class,
-                                ResourcePoolsBuilder.heap(this.lookupVolumeCacheCount))
+                                ResourcePoolsBuilder.heap(this.lookupVolumeCacheEntries))
                                 .withExpiry(Expirations.timeToLiveExpiration(
                                         Duration.of(this.lookupVolumeCacheExpiry, TimeUnit.SECONDS))).build());
         }

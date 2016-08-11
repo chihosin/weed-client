@@ -1,7 +1,30 @@
+/*
+ * Copyright (c) 2016 Lokra Platform
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package org.lokra.seaweedfs;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.http.client.cache.HttpCacheStorage;
 import org.lokra.seaweedfs.core.SystemConnection;
 import org.lokra.seaweedfs.util.ConnectionUtil;
 import org.springframework.beans.factory.DisposableBean;
@@ -20,14 +43,18 @@ public class FileSystemManager implements InitializingBean, DisposableBean {
 
     private String host = "localhost";
     private int port = 9333;
-    private int timeout = 10000;
+    private int connectionTimeout = 10000;
     private int statusExpiry = 30;
     private int maxConnection = 100;
     private int idleConnectionExpiry = 30;
     private int maxConnectionsPreRoute = 1000;
-    private boolean enableLookupVolumeCache = false;
+    private boolean enableLookupVolumeCache = true;
     private int lookupVolumeCacheExpiry = 120;
-    private int lookupVolumeCacheCount = 100;
+    private int lookupVolumeCacheEntries = 100;
+    private boolean enableFileStreamCache = true;
+    private int fileStreamCacheEntries = 1000;
+    private long fileStreamCacheSize = 8192;
+    private HttpCacheStorage fileStreamCacheStorage = null;
     private boolean startup = false;
 
     private SystemConnection systemConnection;
@@ -48,14 +75,18 @@ public class FileSystemManager implements InitializingBean, DisposableBean {
             if (this.systemConnection == null) {
                 this.systemConnection = new SystemConnection(
                         ConnectionUtil.convertUrlWithScheme(host + ":" + port),
-                        this.timeout,
+                        this.connectionTimeout,
                         this.statusExpiry,
                         this.idleConnectionExpiry,
                         this.maxConnection,
                         this.maxConnectionsPreRoute,
                         this.enableLookupVolumeCache,
                         this.lookupVolumeCacheExpiry,
-                        this.lookupVolumeCacheCount);
+                        this.lookupVolumeCacheEntries,
+                        this.enableFileStreamCache,
+                        this.fileStreamCacheEntries,
+                        this.fileStreamCacheSize,
+                        this.fileStreamCacheStorage);
             }
             this.systemConnection.startup();
             this.startup = true;
@@ -107,12 +138,12 @@ public class FileSystemManager implements InitializingBean, DisposableBean {
         this.port = port;
     }
 
-    public int getTimeout() {
-        return timeout;
+    public int getConnectionTimeout() {
+        return connectionTimeout;
     }
 
-    public void setTimeout(int timeout) {
-        this.timeout = timeout;
+    public void setConnectionTimeout(int connectionTimeout) {
+        this.connectionTimeout = connectionTimeout;
     }
 
     public int getStatusExpiry() {
@@ -163,11 +194,44 @@ public class FileSystemManager implements InitializingBean, DisposableBean {
         this.idleConnectionExpiry = idleConnectionExpiry;
     }
 
-    public int getLookupVolumeCacheCount() {
-        return lookupVolumeCacheCount;
+    public int getLookupVolumeCacheEntries() {
+        return lookupVolumeCacheEntries;
     }
 
-    public void setLookupVolumeCacheCount(int lookupVolumeCacheCount) {
-        this.lookupVolumeCacheCount = lookupVolumeCacheCount;
+    public void setLookupVolumeCacheEntries(int lookupVolumeCacheEntries) {
+        this.lookupVolumeCacheEntries = lookupVolumeCacheEntries;
     }
+
+    public boolean isEnableFileStreamCache() {
+        return enableFileStreamCache;
+    }
+
+    public void setEnableFileStreamCache(boolean enableFileStreamCache) {
+        this.enableFileStreamCache = enableFileStreamCache;
+    }
+
+    public int getFileStreamCacheEntries() {
+        return fileStreamCacheEntries;
+    }
+
+    public void setFileStreamCacheEntries(int fileStreamCacheEntries) {
+        this.fileStreamCacheEntries = fileStreamCacheEntries;
+    }
+
+    public long getFileStreamCacheSize() {
+        return fileStreamCacheSize;
+    }
+
+    public void setFileStreamCacheSize(long fileStreamCacheSize) {
+        this.fileStreamCacheSize = fileStreamCacheSize;
+    }
+
+    public HttpCacheStorage getFileStreamCacheStorage() {
+        return fileStreamCacheStorage;
+    }
+
+    public void setFileStreamCacheStorage(HttpCacheStorage fileStreamCacheStorage) {
+        this.fileStreamCacheStorage = fileStreamCacheStorage;
+    }
+
 }
