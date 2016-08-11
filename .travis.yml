@@ -6,7 +6,7 @@ services:
 
 before_install:
   - docker build -t weed .
-  - docker run -d --name weed weed
+  - docker run -d -P --name weed weed
   - docker ps -a
 
 script:
