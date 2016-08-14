@@ -22,6 +22,8 @@
 
 package org.lokra.seaweedfs;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -31,6 +33,8 @@ import org.lokra.seaweedfs.test.ConnectionManagerUtil;
  * @author Chiho Sin
  */
 public class FileSystemManagerTest {
+
+    private static final Log log = LogFactory.getLog(FileSystemManagerTest.class);
 
     private static FileSystemManager manager;
 
@@ -43,8 +47,8 @@ public class FileSystemManagerTest {
     @Test
     public void getSystemConnection() throws Exception {
         Assert.assertFalse(manager.getSystemConnection().isConnectionClose());
-        System.out.println("System Cluster:\n" + manager.getSystemConnection().getSystemClusterStatus());
-        System.out.println("System Topology:\n" + manager.getSystemConnection().getSystemTopologyStatus());
+        log.info("System Cluster:\n" + manager.getSystemConnection().getSystemClusterStatus());
+        log.info("System Topology:\n" + manager.getSystemConnection().getSystemTopologyStatus());
     }
 
 }
