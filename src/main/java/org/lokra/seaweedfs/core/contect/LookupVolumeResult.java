@@ -23,6 +23,7 @@
 package org.lokra.seaweedfs.core.contect;
 
 import java.util.List;
+import java.util.Random;
 
 /**
  * @author Chiho Sin
@@ -30,6 +31,7 @@ import java.util.List;
 public class LookupVolumeResult {
 
     private long volumeId;
+    private Random random = new Random();
     private List<LocationResult> locations;
 
     public long getVolumeId() {
@@ -50,7 +52,7 @@ public class LookupVolumeResult {
 
     public LocationResult getRandomLocation() {
         if (locations != null) {
-            return locations.get(((int) (Math.random() * locations.size())));
+            return locations.get((random.nextInt(locations.size())));
         } else {
             return null;
         }
