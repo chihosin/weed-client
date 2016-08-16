@@ -21,11 +21,13 @@
  */
 
 
-group 'org.lokra.seaweedfs'
-version '1.0-SNAPSHOT'
-
 apply plugin: 'java'
+apply plugin: 'eclipse'
 
+jar {
+    baseName = 'seaweedfs-client'
+    version = '0.7.0-SNAPSHOT'
+}
 targetCompatibility = 1.7
 sourceCompatibility = 1.7
 
@@ -34,6 +36,7 @@ configurations { providedCompile }
 repositories {
     mavenCentral()
 }
+
 
 dependencies {
     compile('com.fasterxml.jackson.core:jackson-databind:2.8.0')
@@ -50,3 +53,11 @@ dependencies {
 sourceSets.main.compileClasspath += configurations.providedCompile
 sourceSets.test.compileClasspath += configurations.providedCompile
 sourceSets.test.runtimeClasspath += configurations.providedCompile
+
+
+eclipse {
+    classpath {
+        containers.remove('org.eclipse.jdt.launching.JRE_CONTAINER')
+        containers 'org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7'
+    }
+}
