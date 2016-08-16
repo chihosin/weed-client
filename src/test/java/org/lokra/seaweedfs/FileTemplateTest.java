@@ -26,7 +26,6 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.lokra.seaweedfs.core.FileHandleStatus;
-import org.lokra.seaweedfs.test.ConnectionManagerUtil;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -41,8 +40,8 @@ public class FileTemplateTest {
 
     @BeforeClass
     public static void setBeforeClass() throws Exception {
-        ConnectionManagerUtil.startup();
-        template = new FileTemplate(ConnectionManagerUtil.connectionManager.getSystemConnection());
+        FileSystemTest.startup();
+        template = new FileTemplate(FileSystemTest.connectionManager.getSystemConnection());
     }
 
     @Test

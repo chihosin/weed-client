@@ -25,12 +25,21 @@ package org.lokra.seaweedfs.core;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.lokra.seaweedfs.test.ConnectionManagerUtil;
+import org.lokra.seaweedfs.FileSystemTest;
 
 /**
  * @author Chiho Sin
  */
 public class SystemConnectionTest {
+
+    private static SystemConnection connection;
+
+    @BeforeClass
+    public static void setBeforeClass() throws Exception {
+        FileSystemTest.startup();
+        Thread.sleep(1000);
+        connection = FileSystemTest.connectionManager.getSystemConnection();
+    }
 
     @Test
     public void getSystemClusterStatus() throws Exception {
@@ -59,15 +68,6 @@ public class SystemConnectionTest {
                         .getDataCenters().get(0).getRacks().get(0).getDataNodes().get(0).getUrl();
         Assert.assertEquals(dataNodeUrl,
                 connection.getVolumeStatus(dataNodeUrl).getUrl());
-    }
-
-    private static SystemConnection connection;
-
-    @BeforeClass
-    public static void setBeforeClass() throws Exception {
-        ConnectionManagerUtil.startup();
-        Thread.sleep(1000);
-        connection = ConnectionManagerUtil.connectionManager.getSystemConnection();
     }
 
 }

@@ -20,16 +20,14 @@
  * SOFTWARE.
  */
 
-package org.lokra.seaweedfs.test;
-
-import org.lokra.seaweedfs.FileSystemManager;
+package org.lokra.seaweedfs;
 
 import java.io.IOException;
 
 /**
  * @author Chiho Sin
  */
-public class ConnectionManagerUtil {
+public class FileSystemTest {
 
     public static FileSystemManager connectionManager;
 

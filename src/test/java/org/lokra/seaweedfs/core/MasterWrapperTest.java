@@ -26,13 +26,23 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.lokra.seaweedfs.FileSystemManager;
+import org.lokra.seaweedfs.FileSystemTest;
 import org.lokra.seaweedfs.core.contect.*;
-import org.lokra.seaweedfs.test.ConnectionManagerUtil;
 
 /**
  * @author Chiho Sin
  */
 public class MasterWrapperTest {
+
+    private static MasterWrapper wrapper;
+
+    @BeforeClass
+    public static void setBeforeClass() throws Exception {
+        FileSystemTest.startup();
+        Thread.sleep(1000);
+        FileSystemManager manager = FileSystemTest.connectionManager;
+        wrapper = new MasterWrapper(manager.getSystemConnection());
+    }
 
     @Test
     public void lookupVolume() throws Exception {
@@ -65,16 +75,6 @@ public class MasterWrapperTest {
         AssignFileKeyResult result = wrapper.assignFileKey(params);
         Assert.assertEquals(Long.parseLong(String.valueOf(params.getCount())),
                 Long.parseLong(String.valueOf(result.getCount())));
-    }
-
-    private static MasterWrapper wrapper;
-
-    @BeforeClass
-    public static void setBeforeClass() throws Exception {
-        ConnectionManagerUtil.startup();
-        Thread.sleep(1000);
-        FileSystemManager manager = ConnectionManagerUtil.connectionManager;
-        wrapper = new MasterWrapper(manager.getSystemConnection());
     }
 
 }

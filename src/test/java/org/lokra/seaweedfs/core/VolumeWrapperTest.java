@@ -27,9 +27,9 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.lokra.seaweedfs.FileSystemManager;
+import org.lokra.seaweedfs.FileSystemTest;
 import org.lokra.seaweedfs.core.contect.AssignFileKeyParams;
 import org.lokra.seaweedfs.core.contect.AssignFileKeyResult;
-import org.lokra.seaweedfs.test.ConnectionManagerUtil;
 
 import java.io.ByteArrayInputStream;
 
@@ -37,6 +37,18 @@ import java.io.ByteArrayInputStream;
  * @author Chiho Sin
  */
 public class VolumeWrapperTest {
+    private static MasterWrapper masterWrapper;
+    private static VolumeWrapper volumeWrapper;
+
+    @BeforeClass
+    public static void setBeforeClass() throws Exception {
+        FileSystemTest.startup();
+        Thread.sleep(1000);
+        FileSystemManager manager = FileSystemTest.connectionManager;
+        volumeWrapper = new VolumeWrapper(manager.getSystemConnection());
+        masterWrapper = new MasterWrapper(manager.getSystemConnection());
+    }
+
     @Test
     public void checkFileExist() throws Exception {
         AssignFileKeyParams params = new AssignFileKeyParams();
@@ -115,18 +127,6 @@ public class VolumeWrapperTest {
                         new ByteArrayInputStream("@uploadFile".getBytes()),
                         null,
                         ContentType.DEFAULT_BINARY) > 0L);
-    }
-
-    private static MasterWrapper masterWrapper;
-    private static VolumeWrapper volumeWrapper;
-
-    @BeforeClass
-    public static void setBeforeClass() throws Exception {
-        ConnectionManagerUtil.startup();
-        Thread.sleep(1000);
-        FileSystemManager manager = ConnectionManagerUtil.connectionManager;
-        volumeWrapper = new VolumeWrapper(manager.getSystemConnection());
-        masterWrapper = new MasterWrapper(manager.getSystemConnection());
     }
 
 }

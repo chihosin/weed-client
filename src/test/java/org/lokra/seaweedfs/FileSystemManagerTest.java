@@ -27,7 +27,6 @@ import org.apache.commons.logging.LogFactory;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.lokra.seaweedfs.test.ConnectionManagerUtil;
 
 /**
  * @author Chiho Sin
@@ -40,8 +39,8 @@ public class FileSystemManagerTest {
 
     @BeforeClass
     public static void setBeforeClass() throws Exception {
-        ConnectionManagerUtil.startup();
-        manager = ConnectionManagerUtil.connectionManager;
+        FileSystemTest.startup();
+        manager = FileSystemTest.connectionManager;
     }
 
     @Test
