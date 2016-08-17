@@ -57,13 +57,14 @@ public class VolumeWrapper {
     /**
      * Upload file.
      *
-     * @param url
-     * @param fid
-     * @param fileName
-     * @param stream
-     * @param ttl
+     * @param url         url
+     * @param fid         fid
+     * @param fileName    fileName
+     * @param stream      stream
+     * @param ttl         ttl
+     * @param contentType contentType
      * @return The size returned is the size stored on SeaweedFS.
-     * @throws IOException
+     * @throws IOException IOException
      */
     public long uploadFile(String url, String fid, String fileName, InputStream stream, String ttl,
                            ContentType contentType)
@@ -87,10 +88,9 @@ public class VolumeWrapper {
     /**
      * Delete file.
      *
-     * @param url
-     * @param fid
-     * @return The size returned is the trash size stored on SeaweedFS.
-     * @throws IOException
+     * @param url url
+     * @param fid fid
+     * @throws IOException IOException
      */
     public void deleteFile(String url, String fid) throws IOException {
         HttpDelete request = new HttpDelete(url + "/" + fid);
@@ -101,10 +101,10 @@ public class VolumeWrapper {
     /**
      * Check file is exist.
      *
-     * @param url
-     * @param fid
-     * @return
-     * @throws IOException
+     * @param url url
+     * @param fid fid
+     * @return return
+     * @throws IOException IOException
      */
     public boolean checkFileExist(String url, String fid) throws IOException {
         HttpHead request = new HttpHead(url + "/" + fid);
@@ -120,10 +120,10 @@ public class VolumeWrapper {
     /**
      * Get file stream.
      *
-     * @param url
-     * @param fid
-     * @return
-     * @throws IOException
+     * @param url url
+     * @param fid fid
+     * @return return
+     * @throws IOException IOException IOException
      */
     public StreamResponse getFileStream(String url, String fid) throws IOException {
         HttpGet request = new HttpGet(url + "/" + fid);
@@ -135,10 +135,10 @@ public class VolumeWrapper {
     /**
      * Get file status.
      *
-     * @param url
-     * @param fid
-     * @return
-     * @throws IOException
+     * @param url url
+     * @param fid fid
+     * @return return
+     * @throws IOException IOException IOException
      */
     public HeaderResponse getFileStatus(String url, String fid) throws IOException {
         HttpHead request = new HttpHead(url + "/" + fid);

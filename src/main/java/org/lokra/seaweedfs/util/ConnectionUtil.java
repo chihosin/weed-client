@@ -69,6 +69,7 @@ public class ConnectionUtil {
      * Convert url with scheme match seaweedfs server
      *
      * @param serverUrl url without scheme
+     * @return result
      */
     public static String convertUrlWithScheme(String serverUrl) {
         return "http://" + serverUrl;

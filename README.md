@@ -10,6 +10,30 @@ This Java client is encapsulates the functionality full of the SeaweedFS API and
 
 For performance, the library used Http Client cached some fetch file result stream and you can custom cache storage implement. Ehcached is used for lookup cached volume location, location url load balance can disperse user's requests and reduce the local load of server and local traffic of networks.
 
+# Setup
+
+##### Maven Repository
+
+```xml
+<dependency>
+  <groupId>org.lokra.seaweedfs</groupId>
+  <artifactId>seaweedfs-client</artifactId>
+  <version>0.7.0.RELEASE</version>
+</dependency>
+```
+or
+
+##### Gradle Dependency
+```
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile('org.lokra.seaweedfs:seaweedfs-client:0.7.0.RELEASE')
+}
+```
+
 # Usage
 
 ##### Create a connection manager

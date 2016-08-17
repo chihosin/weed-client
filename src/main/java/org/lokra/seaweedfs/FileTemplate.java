@@ -78,7 +78,7 @@ public class FileTemplate implements InitializingBean, DisposableBean {
      * @param fileName file name, that can be gzipped based on the file name extension and zip it.
      * @param stream   file stream.
      * @return File status.
-     * @throws IOException
+     * @throws IOException IOException
      */
     public FileHandleStatus saveFileByStream(String fileName, InputStream stream) throws IOException {
         return saveFileByStream(fileName, stream, ContentType.DEFAULT_BINARY);
@@ -91,7 +91,7 @@ public class FileTemplate implements InitializingBean, DisposableBean {
      * @param stream      file stream.
      * @param contentType file content type.
      * @return File status.
-     * @throws IOException
+     * @throws IOException IOException
      */
     public FileHandleStatus saveFileByStream(String fileName, InputStream stream, ContentType contentType)
             throws IOException {
@@ -119,7 +119,7 @@ public class FileTemplate implements InitializingBean, DisposableBean {
      *
      * @param streamMap map of file name and file stream.
      * @return Files status.
-     * @throws IOException
+     * @throws IOException IOException
      */
     public LinkedHashMap<String, FileHandleStatus> saveFilesByStreamMap(LinkedHashMap<String, InputStream> streamMap)
             throws IOException {
@@ -132,7 +132,7 @@ public class FileTemplate implements InitializingBean, DisposableBean {
      * @param streamMap   map of file name and file stream.
      * @param contentType file content type.
      * @return Files status.
-     * @throws IOException
+     * @throws IOException IOException
      */
     public LinkedHashMap<String, FileHandleStatus> saveFilesByStreamMap(LinkedHashMap<String, InputStream> streamMap,
                                                                         ContentType contentType) throws IOException {
@@ -184,7 +184,7 @@ public class FileTemplate implements InitializingBean, DisposableBean {
      * Delete file.
      *
      * @param fileId file id whatever file is not exist.
-     * @throws IOException
+     * @throws IOException IOException
      */
     public void deleteFile(String fileId) throws IOException {
         final String targetUrl = getTargetUrl(fileId);
@@ -199,7 +199,7 @@ public class FileTemplate implements InitializingBean, DisposableBean {
      * Delete files.
      *
      * @param fileIds file id list whatever file is not exist.
-     * @throws IOException
+     * @throws IOException IOException
      */
     public void deleteFiles(ArrayList<String> fileIds) throws IOException {
         LinkedHashMap<String, Boolean> resultMap = new LinkedHashMap<String, Boolean>();
@@ -217,7 +217,7 @@ public class FileTemplate implements InitializingBean, DisposableBean {
      * @param stream      file stream.
      * @param contentType file content type.
      * @return Files status.
-     * @throws IOException
+     * @throws IOException IOException
      */
     public FileHandleStatus updateFileByStream(String fileId, String fileName, InputStream stream,
                                                ContentType contentType) throws IOException {
@@ -237,7 +237,7 @@ public class FileTemplate implements InitializingBean, DisposableBean {
      * @param fileName file name.
      * @param stream   file stream.
      * @return Files status.
-     * @throws IOException
+     * @throws IOException IOException
      */
     public FileHandleStatus updateFileByStream(String fileId, String fileName,
                                                InputStream stream) throws IOException {
@@ -249,6 +249,7 @@ public class FileTemplate implements InitializingBean, DisposableBean {
      *
      * @param fileId file id.
      * @return File stream cache in jvm.
+     * @throws IOException IOException
      */
     public StreamResponse getFileStream(String fileId) throws IOException {
         final String targetUrl = getTargetUrl(fileId);
@@ -260,7 +261,7 @@ public class FileTemplate implements InitializingBean, DisposableBean {
      *
      * @param fileId File id.
      * @return File status.
-     * @throws IOException
+     * @throws IOException IOException
      */
     public FileHandleStatus getFileStatus(String fileId) throws IOException {
         final String targetUrl = getTargetUrl(fileId);
@@ -283,7 +284,7 @@ public class FileTemplate implements InitializingBean, DisposableBean {
      *
      * @param fileId File id.
      * @return File url.
-     * @throws IOException
+     * @throws IOException IOException
      */
     public String getFileUrl(String fileId) throws IOException {
         final String targetUrl = getTargetUrl(fileId);

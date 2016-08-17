@@ -65,6 +65,7 @@ public class FileSystemManager implements InitializingBean, DisposableBean {
 
     /**
      * Start up the connection to the Seaweedfs server
+     * @throws IOException IOException
      */
     public void startup() throws IOException {
         if (this.startup) {
@@ -105,7 +106,7 @@ public class FileSystemManager implements InitializingBean, DisposableBean {
     /**
      * Working with Spring framework startup
      *
-     * @throws Exception
+     * @throws Exception Exception
      */
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -115,7 +116,7 @@ public class FileSystemManager implements InitializingBean, DisposableBean {
     /**
      * Using when the Spring framework is destroy
      *
-     * @throws Exception
+     * @throws Exception Exception
      */
     @Override
     public void destroy() throws Exception {

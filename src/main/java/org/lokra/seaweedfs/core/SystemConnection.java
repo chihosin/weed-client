@@ -91,6 +91,21 @@ public class SystemConnection {
 
     /**
      * Constructor.
+     *
+     * @param leaderUrl                leaderUrl
+     * @param connectionTimeout        connectionTimeout
+     * @param statusExpiry             statusExpiry
+     * @param idleConnectionExpiry     idleConnectionExpiry
+     * @param maxConnection            maxConnection
+     * @param maxConnectionsPreRoute   maxConnectionsPreRoute
+     * @param enableLookupVolumeCache  enableLookupVolumeCache
+     * @param lookupVolumeCacheExpiry  lookupVolumeCacheExpiry
+     * @param lookupVolumeCacheEntries lookupVolumeCacheEntries
+     * @param enableFileStreamCache    enableFileStreamCache
+     * @param fileStreamCacheEntries   fileStreamCacheEntries
+     * @param fileStreamCacheSize      fileStreamCacheSize
+     * @param fileStreamCacheStorage   fileStreamCacheStorage
+     * @throws IOException IOException
      */
     public SystemConnection(String leaderUrl, int connectionTimeout, long statusExpiry, long idleConnectionExpiry,
                             int maxConnection, int maxConnectionsPreRoute, boolean enableLookupVolumeCache,
@@ -188,9 +203,9 @@ public class SystemConnection {
     /**
      * Check volume server status
      *
-     * @param volumeUrl
-     * @return
-     * @throws IOException
+     * @param volumeUrl volumeUrl
+     * @return return
+     * @throws IOException IOException
      */
     @SuppressWarnings({"unused", "unchecked"})
     public VolumeStatus getVolumeStatus(String volumeUrl) throws IOException {

@@ -57,9 +57,9 @@ public class MasterWrapper {
     /**
      * Assign a file key.
      *
-     * @param params
-     * @return
-     * @throws IOException
+     * @param params params
+     * @return result
+     * @throws IOException IOException
      */
     public AssignFileKeyResult assignFileKey(AssignFileKeyParams params) throws IOException {
         checkConnection();
@@ -72,8 +72,8 @@ public class MasterWrapper {
     /**
      * Force garbage collection.
      *
-     * @param params
-     * @throws IOException
+     * @param params params
+     * @throws IOException IOException
      */
     public void forceGarbageCollection(ForceGarbageCollectionParams params) throws IOException {
         checkConnection();
@@ -85,9 +85,9 @@ public class MasterWrapper {
     /**
      * Pre-Allocate volumes.
      *
-     * @param params
-     * @return
-     * @throws IOException
+     * @param params params
+     * @return return
+     * @throws IOException IOException
      */
     public PreAllocateVolumesResult preAllocateVolumes(PreAllocateVolumesParams params) throws IOException {
         checkConnection();
@@ -100,9 +100,9 @@ public class MasterWrapper {
     /**
      * Lookup volume.
      *
-     * @param params
-     * @return
-     * @throws IOException
+     * @param params params
+     * @return return
+     * @throws IOException IOException
      */
     public LookupVolumeResult lookupVolume(LookupVolumeParams params) throws IOException {
         checkConnection();
@@ -124,9 +124,9 @@ public class MasterWrapper {
     /**
      * Fetch lookup volume result.
      *
-     * @param params
+     * @param params params
      * @return
-     * @throws IOException
+     * @throws IOException IOException
      */
     private LookupVolumeResult fetchLookupVolumeResult(LookupVolumeParams params) throws IOException {
         checkConnection();
