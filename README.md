@@ -1,6 +1,7 @@
 # SeaweedFS Client For Java
 
 [![Build Status](https://travis-ci.org/lokra-platform/seaweedfs-client.svg?branch=master)](https://travis-ci.org/lokra-platform/seaweedfs-client)
+[![codecov](https://codecov.io/gh/lokra-platform/seaweedfs-client/branch/master/graph/badge.svg)](https://codecov.io/gh/lokra-platform/seaweedfs-client)
 [![MIT license](http://img.shields.io/badge/license-MIT-brightgreen.svg)](http://opensource.org/licenses/MIT)
 
 # Features
