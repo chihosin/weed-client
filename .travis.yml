@@ -13,4 +13,4 @@ script:
   - gradle test -i
 
 after_success:
-  - bash <(curl -s https://codecov.io/bash)
+  - bash <(curl -s https://codecov.io/bash) -t 3e9c5856-6ed4-4f67-8137-2e1b4295d947
