@@ -27,6 +27,7 @@ version = '0.7.0.RELEASE'
 apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'idea'
+apply plugin: 'jacoco'
 apply plugin: 'maven'
 apply plugin: 'signing'
 
@@ -48,6 +49,15 @@ dependencies {
     compile('org.springframework:spring-beans:4.3.1.RELEASE')
     testCompile('junit:junit:4.11')
 }
+
+jacocoTestReport {
+    reports {
+        xml.enabled = true
+        html.enabled = true
+    }
+}
+
+check.dependsOn jacocoTestReport
 
 eclipse {
     classpath {

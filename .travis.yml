@@ -1,4 +1,6 @@
 language: java
+jdk:
+  - oraclejdk8
 sudo: true
 
 install:
@@ -10,7 +12,7 @@ install:
   - weed server -master.port=9335 -volume.port=9445 -volume.max=10 -master.volumeSizeLimitMB=30 -master.peers=0.0.0.0:9334 &
 
 script:
-  - gradle test -i
+  - gradle check
 
 after_success:
-  - bash <(curl -s https://codecov.io/bash) -t 3e9c5856-6ed4-4f67-8137-2e1b4295d947
+  - bash <(curl -s https://codecov.io/bash)
