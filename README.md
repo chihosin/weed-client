@@ -2,6 +2,7 @@
 
 [![Build Status](https://travis-ci.org/lokra-platform/seaweedfs-client.svg?branch=master)](https://travis-ci.org/lokra-platform/seaweedfs-client)
 [![codecov](https://codecov.io/gh/lokra-platform/seaweedfs-client/branch/master/graph/badge.svg)](https://codecov.io/gh/lokra-platform/seaweedfs-client)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/2a98cfb79ad04905940aef2fc5791390)](https://www.codacy.com/app/chihosin/seaweedfs-client?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=lokra-platform/seaweedfs-client&amp;utm_campaign=Badge_Grade)
 [![MIT license](http://img.shields.io/badge/license-MIT-brightgreen.svg)](http://opensource.org/licenses/MIT)
 
 # Features
