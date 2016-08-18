@@ -4,6 +4,7 @@
 [![codecov](https://codecov.io/gh/lokra-platform/seaweedfs-client/branch/master/graph/badge.svg)](https://codecov.io/gh/lokra-platform/seaweedfs-client)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/2a98cfb79ad04905940aef2fc5791390)](https://www.codacy.com/app/chihosin/seaweedfs-client?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=lokra-platform/seaweedfs-client&amp;utm_campaign=Badge_Grade)
 [![Maven Central](http://img.shields.io/badge/maven_central-0.7.1.RELEASE-brightgreen.svg)](https://search.maven.org/#artifactdetails%7Corg.lokra.seaweedfs%7Cseaweedfs-client%7C0.7.1.RELEASE%7Cjar)
+[![GitHub Release](http://img.shields.io/badge/Release-0.7.1.RELEASE-brightgreen.svg)](https://github.com/lokra-platform/seaweedfs-client/releases/tag/0.7.1.RELEASE)
 [![MIT license](http://img.shields.io/badge/license-MIT-blue.svg)](http://opensource.org/licenses/MIT)
 
 # Features
