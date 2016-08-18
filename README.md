@@ -10,11 +10,16 @@
 
 This Java client is encapsulates the functionality full of the SeaweedFS API and provides a simple interface.
 
-For performance, the library used Http Client cached some fetch file result stream and you can custom cache storage implement. Ehcached is used for lookup cached volume location, location url load balance can disperse user's requests and reduce the local load of server and local traffic of networks.
+For performance, we make some progress:
+* Include [Ehcache](https://github.com/ehcache/ehcache3) and used it for cached lookup volume.
+* Include [HttpClient](https://github.com/apache/httpclient) Connection Pool for handle HTTP request.
+* Volume server location load balance.
+* Heuristic cache is used for fetch file stream.
+* Auto switch leader server (master) at failover.
 
-# Setup
+# Quick Start
 
-##### Maven Repository
+##### Maven
 
 ```xml
 <dependency>
@@ -23,9 +28,8 @@ For performance, the library used Http Client cached some fetch file result stre
   <version>0.7.0.RELEASE</version>
 </dependency>
 ```
-or
 
-##### Gradle Dependency
+##### Gradle
 ```
 repositories {
     mavenCentral()
@@ -36,22 +40,44 @@ dependencies {
 }
 ```
 
-# Usage
-
 ##### Create a connection manager
 ```java
-FileSystemManager connectionManager = new FileSystemManager();
+FileSource fileSource = new FileSource();
 // SeaweedFS master server host
-connectionManager.setHost("localhost");
+fileSource.setHost("localhost");
 // SeaweedFS master server port
-connectionManager.setPort(9333);
+fileSource.setPort(9333);
 // Startup manager and listens for the change
-connectionManager.startup();
+fileSource.startup();
 ```
 
 ##### Create a file operation template
 ```java
 // Template used with connection manager
-FileTemplate template = new FileTemplate(connectionManager.getSystemConnection());
+FileTemplate template = new FileTemplate(fileSource.getConnection());
 template.saveFileByStream("filename.doc", someFile);
 ```
+
+## License
+
+The MIT License (MIT)
+
+Copyright (c) 2016 Lokra Studio
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.

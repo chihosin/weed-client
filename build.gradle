@@ -22,7 +22,7 @@
 
 
 group = 'org.lokra.seaweedfs'
-version = '0.7.1.SNAPSHOT'
+version = '0.7.1.RELEASE'
 
 apply plugin: 'java'
 apply plugin: 'eclipse'
