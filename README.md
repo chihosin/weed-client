@@ -3,7 +3,8 @@
 [![Build Status](https://travis-ci.org/lokra-platform/seaweedfs-client.svg?branch=master)](https://travis-ci.org/lokra-platform/seaweedfs-client)
 [![codecov](https://codecov.io/gh/lokra-platform/seaweedfs-client/branch/master/graph/badge.svg)](https://codecov.io/gh/lokra-platform/seaweedfs-client)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/2a98cfb79ad04905940aef2fc5791390)](https://www.codacy.com/app/chihosin/seaweedfs-client?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=lokra-platform/seaweedfs-client&amp;utm_campaign=Badge_Grade)
-[![MIT license](http://img.shields.io/badge/license-MIT-brightgreen.svg)](http://opensource.org/licenses/MIT)
+[![Maven Central](http://img.shields.io/badge/maven_central-0.7.1.RELEASE-brightgreen.svg)](https://search.maven.org/#artifactdetails%7Corg.lokra.seaweedfs%7Cseaweedfs-client%7C0.7.1.RELEASE%7Cjar)
+[![MIT license](http://img.shields.io/badge/license-MIT-blue.svg)](http://opensource.org/licenses/MIT)
 
 # Features
 [SeaweedFS](https://github.com/chrislusf/seaweedfs) is a simple and highly scalable distributed file system and started by implementing [Facebook's Haystack design paper](http://www.usenix.org/event/osdi10/tech/full_papers/Beaver.pdf). SeaweedFS is currently growing, with more features on the way.
