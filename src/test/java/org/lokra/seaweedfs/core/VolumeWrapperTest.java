@@ -81,7 +81,7 @@ public class VolumeWrapperTest {
     }
 
     @Test
-    public void getFileStatus() throws Exception {
+    public void getFileStatusHeader() throws Exception {
         AssignFileKeyParams params = new AssignFileKeyParams();
         AssignFileKeyResult result = masterWrapper.assignFileKey(params);
 
@@ -93,10 +93,9 @@ public class VolumeWrapperTest {
                 null,
                 ContentType.DEFAULT_BINARY);
 
-
         Assert.assertTrue(
                 volumeWrapper.getFileStatusHeader(result.getUrl(),
-                        result.getFid()).getLastHeader("Content-Length").getValue().equals("38"));
+                        result.getFid()).getLastHeader("Content-Length").getValue().equals("44"));
     }
 
     @Test
