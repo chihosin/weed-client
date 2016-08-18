@@ -29,23 +29,23 @@ import java.io.IOException;
  */
 public class FileSystemTest {
 
-    public static FileSystemManager connectionManager;
+    public static FileSource fileSource;
 
     static {
-        connectionManager = new FileSystemManager();
-        connectionManager.setHost("0.0.0.0");
-        connectionManager.setPort(9333);
+        fileSource = new FileSource();
+        fileSource.setHost("0.0.0.0");
+        fileSource.setPort(9333);
     }
 
     public static void startup() throws IOException, InterruptedException {
-        if (connectionManager.getSystemConnection() == null) {
-            connectionManager.startup();
+        if (fileSource.getConnection() == null) {
+            fileSource.startup();
             Thread.sleep(3000);
         }
     }
 
     public static void shutdown() {
-        connectionManager.shutdown();
+        fileSource.shutdown();
     }
 
 }

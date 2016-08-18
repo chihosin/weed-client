@@ -25,7 +25,7 @@ package org.lokra.seaweedfs;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.lokra.seaweedfs.core.FileHandleStatus;
+import org.lokra.seaweedfs.core.file.FileHandleStatus;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -41,7 +41,7 @@ public class FileTemplateTest {
     @BeforeClass
     public static void setBeforeClass() throws Exception {
         FileSystemTest.startup();
-        template = new FileTemplate(FileSystemTest.connectionManager.getSystemConnection());
+        template = new FileTemplate(FileSystemTest.fileSource.getConnection());
     }
 
     @Test
@@ -55,7 +55,7 @@ public class FileTemplateTest {
     @Test
     public void getFileStatus() throws Exception {
         FileHandleStatus fileHandleStatus = template.saveFileByStream("test.txt",
-                new ByteArrayInputStream("@getFileStatus".getBytes()));
+                new ByteArrayInputStream("@getFileStatusHeader".getBytes()));
         Assert.assertTrue(template.getFileStatus(fileHandleStatus.getFileId()).getFileName().equals("test.txt"));
     }
 

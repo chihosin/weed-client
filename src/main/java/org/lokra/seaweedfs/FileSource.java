@@ -25,7 +25,7 @@ package org.lokra.seaweedfs;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.client.cache.HttpCacheStorage;
-import org.lokra.seaweedfs.core.SystemConnection;
+import org.lokra.seaweedfs.core.Connection;
 import org.lokra.seaweedfs.util.ConnectionUtil;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
@@ -33,13 +33,13 @@ import org.springframework.beans.factory.InitializingBean;
 import java.io.IOException;
 
 /**
- * Seaweedfs connection factory
+ * Seaweed file system connection source.
  *
  * @author Chiho Sin
  */
-public class FileSystemManager implements InitializingBean, DisposableBean {
+public class FileSource implements InitializingBean, DisposableBean {
 
-    private static final Log log = LogFactory.getLog(FileSystemManager.class);
+    private static final Log log = LogFactory.getLog(FileSource.class);
 
     private String host = "localhost";
     private int port = 9333;
@@ -57,15 +57,21 @@ public class FileSystemManager implements InitializingBean, DisposableBean {
     private HttpCacheStorage fileStreamCacheStorage = null;
     private boolean startup = false;
 
-    private SystemConnection systemConnection;
+    private Connection connection;
 
-    public SystemConnection getSystemConnection() {
-        return systemConnection;
+    /**
+     * Get wrapper connection.
+     *
+     * @return Wrapper connection.
+     */
+    public Connection getConnection() {
+        return connection;
     }
 
     /**
      * Start up the connection to the Seaweedfs server
-     * @throws IOException IOException
+     *
+     * @throws IOException Http connection is fail or server response within some error message.
      */
     public void startup() throws IOException {
         if (this.startup) {
@@ -73,8 +79,8 @@ public class FileSystemManager implements InitializingBean, DisposableBean {
         } else {
             log.info("start connect to the seaweedfs core server [" +
                     ConnectionUtil.convertUrlWithScheme(host + ":" + port) + "]");
-            if (this.systemConnection == null) {
-                this.systemConnection = new SystemConnection(
+            if (this.connection == null) {
+                this.connection = new Connection(
                         ConnectionUtil.convertUrlWithScheme(host + ":" + port),
                         this.connectionTimeout,
                         this.statusExpiry,
@@ -89,7 +95,7 @@ public class FileSystemManager implements InitializingBean, DisposableBean {
                         this.fileStreamCacheSize,
                         this.fileStreamCacheStorage);
             }
-            this.systemConnection.startup();
+            this.connection.startup();
             this.startup = true;
         }
     }
@@ -99,14 +105,14 @@ public class FileSystemManager implements InitializingBean, DisposableBean {
      */
     public void shutdown() {
         log.info("stop connect to the seaweedfs core server");
-        if (this.systemConnection != null)
-            this.systemConnection.stop();
+        if (this.connection != null)
+            this.connection.stop();
     }
 
     /**
      * Working with Spring framework startup
      *
-     * @throws Exception Exception
+     * @throws IOException Http connection is fail or server response within some error message.
      */
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -116,7 +122,7 @@ public class FileSystemManager implements InitializingBean, DisposableBean {
     /**
      * Using when the Spring framework is destroy
      *
-     * @throws Exception Exception
+     * @throws IOException Http connection is fail or server response within some error message.
      */
     @Override
     public void destroy() throws Exception {

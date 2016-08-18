@@ -20,54 +20,34 @@
  * SOFTWARE.
  */
 
-package org.lokra.seaweedfs.core;
+package org.lokra.seaweedfs;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.lokra.seaweedfs.FileSystemTest;
 
 /**
  * @author Chiho Sin
  */
-public class SystemConnectionTest {
+public class FileSourceTest {
 
-    private static SystemConnection connection;
+    private static final Log log = LogFactory.getLog(FileSourceTest.class);
+
+    private static FileSource manager;
 
     @BeforeClass
     public static void setBeforeClass() throws Exception {
         FileSystemTest.startup();
-        Thread.sleep(1000);
-        connection = FileSystemTest.connectionManager.getSystemConnection();
+        manager = FileSystemTest.fileSource;
     }
 
     @Test
-    public void getSystemClusterStatus() throws Exception {
-        Assert.assertTrue(connection.getSystemClusterStatus().getLeader().isActive());
-    }
-
-    @Test
-    public void getSystemTopologyStatus() throws Exception {
-        Assert.assertTrue(connection.getSystemTopologyStatus().getMax() > 0);
-    }
-
-    @Test
-    public void isConnectionClose() throws Exception {
-        Assert.assertFalse(connection.isConnectionClose());
-    }
-
-    @Test
-    public void getLeaderUrl() throws Exception {
-        Assert.assertNotNull(connection.getLeaderUrl());
-    }
-
-    @Test
-    public void getVolumeStatus() throws Exception {
-        String dataNodeUrl =
-                connection.getSystemTopologyStatus()
-                        .getDataCenters().get(0).getRacks().get(0).getDataNodes().get(0).getUrl();
-        Assert.assertEquals(dataNodeUrl,
-                connection.getVolumeStatus(dataNodeUrl).getUrl());
+    public void getSystemConnection() throws Exception {
+        Assert.assertFalse(manager.getConnection().isConnectionClose());
+        log.info("System Cluster:\n" + manager.getConnection().getSystemClusterStatus());
+        log.info("System Topology:\n" + manager.getConnection().getSystemTopologyStatus());
     }
 
 }

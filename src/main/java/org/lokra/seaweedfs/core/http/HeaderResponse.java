@@ -20,57 +20,57 @@
  * SOFTWARE.
  */
 
-package org.lokra.seaweedfs.core;
+package org.lokra.seaweedfs.core.http;
+
+import org.apache.http.Header;
+
+import java.util.Arrays;
 
 /**
  * @author Chiho Sin
  */
-public class FileHandleStatus {
+public class HeaderResponse {
 
-    private String fileId;
-    private long lastModified;
-    private String fileName;
-    private String contentType;
-    private long size;
+    private Header[] headers;
+    private int httpResponseStatusCode;
 
-    public FileHandleStatus(String fileId, long lastModified, String fileName, String contentType, long size) {
-        this.fileId = fileId;
-        this.lastModified = lastModified;
-        this.fileName = fileName;
-        this.contentType = contentType;
-        this.size = size;
+    public HeaderResponse(Header[] headers, int httpResponseStatusCode) {
+        this.httpResponseStatusCode = httpResponseStatusCode;
+        if (headers == null)
+            return;
+        this.headers = headers;
     }
 
-    public FileHandleStatus(String fileId, long size) {
-        this.fileId = fileId;
-        this.size = size;
+    public Header[] getHeaders() {
+        return headers;
     }
 
-    public String getFileId() {
-        return fileId;
+    public int getHttpResponseStatusCode() {
+        return httpResponseStatusCode;
     }
 
-    public long getSize() {
-        return size;
+    public Header getLastHeader(String name) {
+        for (int index = headers.length - 1; index > -1; index--) {
+            if (headers[index].getName().equals(name))
+                return headers[index];
+        }
+        return null;
     }
 
-    public long getLastModified() {
-        return lastModified;
-    }
-
-    public String getFileName() {
-        return fileName;
-    }
-
-    public String getContentType() {
-        return contentType;
+    public Header getFirstHeader(String name) {
+        for (int index = 0; index < headers.length; index++) {
+            if (headers[index].getName().equals(name))
+                return headers[index];
+        }
+        return null;
     }
 
     @Override
     public String toString() {
-        return "FileHandleStatus{" +
-                "fileId='" + fileId + '\'' +
-                ", size=" + size +
+        return "HeaderResponse{" +
+                "headers=" + Arrays.toString(headers) +
+                ", httpResponseStatusCode=" + httpResponseStatusCode +
                 '}';
     }
+
 }

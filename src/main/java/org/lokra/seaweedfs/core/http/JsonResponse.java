@@ -20,34 +20,18 @@
  * SOFTWARE.
  */
 
-package org.lokra.seaweedfs;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+package org.lokra.seaweedfs.core.http;
 
 /**
  * @author Chiho Sin
  */
-public class FileSystemManagerTest {
+public class JsonResponse {
 
-    private static final Log log = LogFactory.getLog(FileSystemManagerTest.class);
+    public final String json;
+    public final int statusCode;
 
-    private static FileSystemManager manager;
-
-    @BeforeClass
-    public static void setBeforeClass() throws Exception {
-        FileSystemTest.startup();
-        manager = FileSystemTest.connectionManager;
+    public JsonResponse(String json, int statusCode) {
+        this.json = json;
+        this.statusCode = statusCode;
     }
-
-    @Test
-    public void getSystemConnection() throws Exception {
-        Assert.assertFalse(manager.getSystemConnection().isConnectionClose());
-        log.info("System Cluster:\n" + manager.getSystemConnection().getSystemClusterStatus());
-        log.info("System Topology:\n" + manager.getSystemConnection().getSystemTopologyStatus());
-    }
-
 }

@@ -26,10 +26,11 @@ import org.apache.http.entity.ContentType;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.lokra.seaweedfs.FileSystemManager;
+import org.lokra.seaweedfs.FileSource;
 import org.lokra.seaweedfs.FileSystemTest;
 import org.lokra.seaweedfs.core.contect.AssignFileKeyParams;
 import org.lokra.seaweedfs.core.contect.AssignFileKeyResult;
+import org.lokra.seaweedfs.core.http.StreamResponse;
 
 import java.io.ByteArrayInputStream;
 
@@ -44,9 +45,9 @@ public class VolumeWrapperTest {
     public static void setBeforeClass() throws Exception {
         FileSystemTest.startup();
         Thread.sleep(1000);
-        FileSystemManager manager = FileSystemTest.connectionManager;
-        volumeWrapper = new VolumeWrapper(manager.getSystemConnection());
-        masterWrapper = new MasterWrapper(manager.getSystemConnection());
+        FileSource manager = FileSystemTest.fileSource;
+        volumeWrapper = new VolumeWrapper(manager.getConnection());
+        masterWrapper = new MasterWrapper(manager.getConnection());
     }
 
     @Test
@@ -88,13 +89,13 @@ public class VolumeWrapperTest {
                 result.getUrl(),
                 result.getFid(),
                 "test.txt",
-                new ByteArrayInputStream("@getFileStatus".getBytes()),
+                new ByteArrayInputStream("@getFileStatusHeader".getBytes()),
                 null,
                 ContentType.DEFAULT_BINARY);
 
 
         Assert.assertTrue(
-                volumeWrapper.getFileStatus(result.getUrl(),
+                volumeWrapper.getFileStatusHeader(result.getUrl(),
                         result.getFid()).getLastHeader("Content-Length").getValue().equals("38"));
     }
 

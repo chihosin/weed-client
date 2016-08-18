@@ -25,7 +25,7 @@ package org.lokra.seaweedfs.core;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.lokra.seaweedfs.FileSystemManager;
+import org.lokra.seaweedfs.FileSource;
 import org.lokra.seaweedfs.FileSystemTest;
 import org.lokra.seaweedfs.core.contect.*;
 
@@ -40,8 +40,8 @@ public class MasterWrapperTest {
     public static void setBeforeClass() throws Exception {
         FileSystemTest.startup();
         Thread.sleep(1000);
-        FileSystemManager manager = FileSystemTest.connectionManager;
-        wrapper = new MasterWrapper(manager.getSystemConnection());
+        FileSource manager = FileSystemTest.fileSource;
+        wrapper = new MasterWrapper(manager.getConnection());
     }
 
     @Test

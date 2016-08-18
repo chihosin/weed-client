@@ -22,7 +22,7 @@
 
 
 group = 'org.lokra.seaweedfs'
-version = '0.7.0.RELEASE'
+version = '0.7.1.SNAPSHOT'
 
 apply plugin: 'java'
 apply plugin: 'eclipse'
@@ -72,7 +72,7 @@ uploadArchives {
 
             beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
 
-            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+            repository(url: "https://oss.sonatype.org/content/repositories/snapshots") {
                 if (project.hasProperty('sonatypeUsername'))
                     authentication(userName: sonatypeUsername, password: sonatypePassword)
             }

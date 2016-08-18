@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-package org.lokra.seaweedfs.core;
+package org.lokra.seaweedfs.core.http;
 
 import java.io.*;
 

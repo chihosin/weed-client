@@ -20,54 +20,57 @@
  * SOFTWARE.
  */
 
-package org.lokra.seaweedfs.core;
+package org.lokra.seaweedfs.core.file;
 
-import org.lokra.seaweedfs.core.topology.MasterStatus;
+/**
+ * @author Chiho Sin
+ */
+public class FileHandleStatus {
 
-import java.util.List;
+    private String fileId;
+    private long lastModified;
+    private String fileName;
+    private String contentType;
+    private long size;
 
-public class SystemClusterStatus {
+    public FileHandleStatus(String fileId, long lastModified, String fileName, String contentType, long size) {
+        this.fileId = fileId;
+        this.lastModified = lastModified;
+        this.fileName = fileName;
+        this.contentType = contentType;
+        this.size = size;
+    }
 
-    private MasterStatus leader;
-    private List<MasterStatus> peers;
-    private int total;
-    private int available;
+    public FileHandleStatus(String fileId, long size) {
+        this.fileId = fileId;
+        this.size = size;
+    }
 
-    public SystemClusterStatus(MasterStatus leader, List<MasterStatus> peers) {
-        this.leader = leader;
-        this.peers = peers;
-        this.total = peers.size() + 1;
-        this.available = 1;
-        for (MasterStatus item : peers) {
-            if (item.isActive()) {
-                this.available++;
-            }
-        }
+    public String getFileId() {
+        return fileId;
+    }
+
+    public long getSize() {
+        return size;
+    }
+
+    public long getLastModified() {
+        return lastModified;
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public String getContentType() {
+        return contentType;
     }
 
     @Override
     public String toString() {
-        return "SystemClusterStatus{" +
-                "leader=" + leader +
-                ", peers=" + peers +
-                ", total=" + total +
-                ", available=" + available +
+        return "FileHandleStatus{" +
+                "fileId='" + fileId + '\'' +
+                ", size=" + size +
                 '}';
-    }
-
-    public MasterStatus getLeader() {
-        return leader;
-    }
-
-    public List<MasterStatus> getPeers() {
-        return peers;
-    }
-
-    public int getTotal() {
-        return total;
-    }
-
-    public int getAvailable() {
-        return available;
     }
 }

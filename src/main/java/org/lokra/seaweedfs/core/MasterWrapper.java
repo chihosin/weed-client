@@ -23,43 +23,48 @@
 package org.lokra.seaweedfs.core;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.http.client.methods.HttpGet;
 import org.ehcache.Cache;
 import org.ehcache.CacheManager;
 import org.lokra.seaweedfs.core.contect.*;
+import org.lokra.seaweedfs.core.http.JsonResponse;
 import org.lokra.seaweedfs.exception.SeaweedfsException;
 import org.lokra.seaweedfs.util.RequestPathStrategy;
 
 import java.io.IOException;
 
+import static org.lokra.seaweedfs.core.Connection.LOOKUP_VOLUME_CACHE_ALIAS;
+
 /**
+ * Master server operation wrapper.
+ *
  * @author Chiho Sin
  */
 public class MasterWrapper {
 
-    private static final Log log = LogFactory.getLog(MasterWrapper.class);
-
-    private SystemConnection connection;
+    private Connection connection;
     private Cache<Long, LookupVolumeResult> lookupVolumeCache;
     private ObjectMapper objectMapper = new ObjectMapper();
 
-    public MasterWrapper(SystemConnection connection) {
+    /**
+     * Constructor.
+     *
+     * @param connection Connection from file source.
+     */
+    public MasterWrapper(Connection connection) {
         this.connection = connection;
         final CacheManager cacheManager = connection.getCacheManager();
         if (cacheManager != null)
             this.lookupVolumeCache =
-                    cacheManager.getCache(SystemConnection.LOOKUP_VOLUME_CACHE_ALIAS,
-                            Long.class, LookupVolumeResult.class);
+                    cacheManager.getCache(LOOKUP_VOLUME_CACHE_ALIAS, Long.class, LookupVolumeResult.class);
     }
 
     /**
      * Assign a file key.
      *
-     * @param params params
-     * @return result
-     * @throws IOException IOException
+     * @param params Assign file key params.
+     * @return Assign file key result.
+     * @throws IOException Http connection is fail or server response within some error message.
      */
     public AssignFileKeyResult assignFileKey(AssignFileKeyParams params) throws IOException {
         checkConnection();
@@ -72,8 +77,8 @@ public class MasterWrapper {
     /**
      * Force garbage collection.
      *
-     * @param params params
-     * @throws IOException IOException
+     * @param params Force garbage collection params.
+     * @throws IOException Http connection is fail or server response within some error message.
      */
     public void forceGarbageCollection(ForceGarbageCollectionParams params) throws IOException {
         checkConnection();
@@ -85,9 +90,9 @@ public class MasterWrapper {
     /**
      * Pre-Allocate volumes.
      *
-     * @param params params
-     * @return return
-     * @throws IOException IOException
+     * @param params pre allocate volumes params.
+     * @return pre allocate volumes result.
+     * @throws IOException Http connection is fail or server response within some error message.
      */
     public PreAllocateVolumesResult preAllocateVolumes(PreAllocateVolumesParams params) throws IOException {
         checkConnection();
@@ -100,9 +105,9 @@ public class MasterWrapper {
     /**
      * Lookup volume.
      *
-     * @param params params
-     * @return return
-     * @throws IOException IOException
+     * @param params Lookup volume params.
+     * @return Lookup volume result.
+     * @throws IOException Http connection is fail or server response within some error message.
      */
     public LookupVolumeResult lookupVolume(LookupVolumeParams params) throws IOException {
         checkConnection();
@@ -124,9 +129,9 @@ public class MasterWrapper {
     /**
      * Fetch lookup volume result.
      *
-     * @param params params
-     * @return
-     * @throws IOException IOException
+     * @param params fetch lookup volume params.
+     * @return fetch lookup volume result.
+     * @throws IOException Http connection is fail or server response within some error message.
      */
     private LookupVolumeResult fetchLookupVolumeResult(LookupVolumeParams params) throws IOException {
         checkConnection();
@@ -139,7 +144,7 @@ public class MasterWrapper {
     /**
      * Check connection is alive.
      *
-     * @throws SeaweedfsException
+     * @throws SeaweedfsException Http connection is fail.
      */
     private void checkConnection() throws SeaweedfsException {
         if (this.connection.isConnectionClose())

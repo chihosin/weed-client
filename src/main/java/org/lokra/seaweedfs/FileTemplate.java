@@ -25,8 +25,13 @@ package org.lokra.seaweedfs;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.entity.ContentType;
-import org.lokra.seaweedfs.core.*;
+import org.lokra.seaweedfs.core.Connection;
+import org.lokra.seaweedfs.core.MasterWrapper;
+import org.lokra.seaweedfs.core.VolumeWrapper;
 import org.lokra.seaweedfs.core.contect.*;
+import org.lokra.seaweedfs.core.file.FileHandleStatus;
+import org.lokra.seaweedfs.core.http.HeaderResponse;
+import org.lokra.seaweedfs.core.http.StreamResponse;
 import org.lokra.seaweedfs.exception.SeaweedfsException;
 import org.lokra.seaweedfs.exception.SeaweedfsFileDeleteException;
 import org.lokra.seaweedfs.exception.SeaweedfsFileNotFoundException;
@@ -43,6 +48,8 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 /**
+ * Seaweed file system operation template.
+ *
  * @author Chiho Sin
  */
 public class FileTemplate implements InitializingBean, DisposableBean {
@@ -66,7 +73,12 @@ public class FileTemplate implements InitializingBean, DisposableBean {
     private boolean loadBalance = true;
     private AssignFileKeyParams assignFileKeyParams = new AssignFileKeyParams();
 
-    public FileTemplate(SystemConnection connection) {
+    /**
+     * Constructor.
+     *
+     * @param connection Connection from file source.
+     */
+    public FileTemplate(Connection connection) {
         this.masterWrapper = new MasterWrapper(connection);
         this.volumeWrapper = new VolumeWrapper(connection);
         headerDateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
@@ -75,10 +87,10 @@ public class FileTemplate implements InitializingBean, DisposableBean {
     /**
      * Save a file.
      *
-     * @param fileName file name, that can be gzipped based on the file name extension and zip it.
-     * @param stream   file stream.
+     * @param fileName File name, that can be gzipped based on the file name extension and zip it.
+     * @param stream   File stream.
      * @return File status.
-     * @throws IOException IOException
+     * @throws IOException Http connection is fail or server response within some error message.
      */
     public FileHandleStatus saveFileByStream(String fileName, InputStream stream) throws IOException {
         return saveFileByStream(fileName, stream, ContentType.DEFAULT_BINARY);
@@ -87,11 +99,11 @@ public class FileTemplate implements InitializingBean, DisposableBean {
     /**
      * Save a file.
      *
-     * @param fileName    file name, that can be gzipped based on the file name extension and zip it.
-     * @param stream      file stream.
-     * @param contentType file content type.
+     * @param fileName    File name, that can be gzipped based on the file name extension and zip it.
+     * @param stream      File stream.
+     * @param contentType File content type.
      * @return File status.
-     * @throws IOException IOException
+     * @throws IOException Http connection is fail or server response within some error message.
      */
     public FileHandleStatus saveFileByStream(String fileName, InputStream stream, ContentType contentType)
             throws IOException {
@@ -117,9 +129,9 @@ public class FileTemplate implements InitializingBean, DisposableBean {
     /**
      * Save files by stream map.
      *
-     * @param streamMap map of file name and file stream.
+     * @param streamMap Map of file name and file stream.
      * @return Files status.
-     * @throws IOException IOException
+     * @throws IOException Http connection is fail or server response within some error message.
      */
     public LinkedHashMap<String, FileHandleStatus> saveFilesByStreamMap(LinkedHashMap<String, InputStream> streamMap)
             throws IOException {
@@ -129,10 +141,10 @@ public class FileTemplate implements InitializingBean, DisposableBean {
     /**
      * Save files by stream map.
      *
-     * @param streamMap   map of file name and file stream.
-     * @param contentType file content type.
+     * @param streamMap   Map of file name and file stream.
+     * @param contentType File content type.
      * @return Files status.
-     * @throws IOException IOException
+     * @throws IOException Http connection is fail or server response within some error message.
      */
     public LinkedHashMap<String, FileHandleStatus> saveFilesByStreamMap(LinkedHashMap<String, InputStream> streamMap,
                                                                         ContentType contentType) throws IOException {
@@ -183,8 +195,8 @@ public class FileTemplate implements InitializingBean, DisposableBean {
     /**
      * Delete file.
      *
-     * @param fileId file id whatever file is not exist.
-     * @throws IOException IOException
+     * @param fileId File id whatever file is not exist.
+     * @throws IOException Http connection is fail or server response within some error message.
      */
     public void deleteFile(String fileId) throws IOException {
         final String targetUrl = getTargetUrl(fileId);
@@ -198,8 +210,8 @@ public class FileTemplate implements InitializingBean, DisposableBean {
     /**
      * Delete files.
      *
-     * @param fileIds file id list whatever file is not exist.
-     * @throws IOException IOException
+     * @param fileIds File id list whatever file is not exist.
+     * @throws IOException Http connection is fail or server response within some error message.
      */
     public void deleteFiles(ArrayList<String> fileIds) throws IOException {
         LinkedHashMap<String, Boolean> resultMap = new LinkedHashMap<String, Boolean>();
@@ -212,12 +224,12 @@ public class FileTemplate implements InitializingBean, DisposableBean {
     /**
      * Update file, if file id is not exist, it wouldn't throw any exception.
      *
-     * @param fileId      file id whatever it is not exist.
-     * @param fileName    file name.
-     * @param stream      file stream.
-     * @param contentType file content type.
+     * @param fileId      File id whatever it is not exist.
+     * @param fileName    File name.
+     * @param stream      File stream.
+     * @param contentType File content type.
      * @return Files status.
-     * @throws IOException IOException
+     * @throws IOException Http connection is fail or server response within some error message.
      */
     public FileHandleStatus updateFileByStream(String fileId, String fileName, InputStream stream,
                                                ContentType contentType) throws IOException {
@@ -233,11 +245,11 @@ public class FileTemplate implements InitializingBean, DisposableBean {
     /**
      * Update file, if file id is not exist, it wouldn't throw any exception.
      *
-     * @param fileId   file id whatever it is not exist.
-     * @param fileName file name.
-     * @param stream   file stream.
+     * @param fileId   File id whatever it is not exist.
+     * @param fileName File name.
+     * @param stream   File stream.
      * @return Files status.
-     * @throws IOException IOException
+     * @throws IOException Http connection is fail or server response within some error message.
      */
     public FileHandleStatus updateFileByStream(String fileId, String fileName,
                                                InputStream stream) throws IOException {
@@ -247,9 +259,9 @@ public class FileTemplate implements InitializingBean, DisposableBean {
     /**
      * Get file stream, this is the faster method to get file stream from server.
      *
-     * @param fileId file id.
+     * @param fileId File id.
      * @return File stream cache in jvm.
-     * @throws IOException IOException
+     * @throws IOException Http connection is fail or server response within some error message.
      */
     public StreamResponse getFileStream(String fileId) throws IOException {
         final String targetUrl = getTargetUrl(fileId);
@@ -261,11 +273,11 @@ public class FileTemplate implements InitializingBean, DisposableBean {
      *
      * @param fileId File id.
      * @return File status.
-     * @throws IOException IOException
+     * @throws IOException Http connection is fail or server response within some error message.
      */
     public FileHandleStatus getFileStatus(String fileId) throws IOException {
         final String targetUrl = getTargetUrl(fileId);
-        HeaderResponse headerResponse = volumeWrapper.getFileStatus(targetUrl, fileId);
+        HeaderResponse headerResponse = volumeWrapper.getFileStatusHeader(targetUrl, fileId);
         try {
             return new FileHandleStatus(fileId,
                     headerDateFormat.parse(headerResponse.getLastHeader("Last-Modified").getValue()).getTime(),
@@ -284,7 +296,7 @@ public class FileTemplate implements InitializingBean, DisposableBean {
      *
      * @param fileId File id.
      * @return File url.
-     * @throws IOException IOException
+     * @throws IOException Http connection is fail or server response within some error message.
      */
     public String getFileUrl(String fileId) throws IOException {
         final String targetUrl = getTargetUrl(fileId);

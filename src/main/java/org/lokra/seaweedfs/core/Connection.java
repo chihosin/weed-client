@@ -46,6 +46,9 @@ import org.ehcache.config.builders.ResourcePoolsBuilder;
 import org.ehcache.expiry.Duration;
 import org.ehcache.expiry.Expirations;
 import org.lokra.seaweedfs.core.contect.LookupVolumeResult;
+import org.lokra.seaweedfs.core.http.HeaderResponse;
+import org.lokra.seaweedfs.core.http.JsonResponse;
+import org.lokra.seaweedfs.core.http.StreamResponse;
 import org.lokra.seaweedfs.core.topology.*;
 import org.lokra.seaweedfs.exception.SeaweedfsException;
 import org.lokra.seaweedfs.util.ConnectionUtil;
@@ -58,15 +61,15 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Master server connection control
+ * Connection for seaweed file system.
  *
  * @author Chiho Sin
  */
-public class SystemConnection {
+public class Connection {
 
     static final String LOOKUP_VOLUME_CACHE_ALIAS = "lookupVolumeCache";
 
-    private static final Log log = LogFactory.getLog(SystemConnection.class);
+    private static final Log log = LogFactory.getLog(Connection.class);
 
     private String leaderUrl;
     private long statusExpiry;
@@ -90,28 +93,28 @@ public class SystemConnection {
     private CacheManager cacheManager = null;
 
     /**
-     * Constructor.
+     * Constructor, build by properties.
      *
-     * @param leaderUrl                leaderUrl
-     * @param connectionTimeout        connectionTimeout
-     * @param statusExpiry             statusExpiry
-     * @param idleConnectionExpiry     idleConnectionExpiry
-     * @param maxConnection            maxConnection
-     * @param maxConnectionsPreRoute   maxConnectionsPreRoute
-     * @param enableLookupVolumeCache  enableLookupVolumeCache
-     * @param lookupVolumeCacheExpiry  lookupVolumeCacheExpiry
-     * @param lookupVolumeCacheEntries lookupVolumeCacheEntries
-     * @param enableFileStreamCache    enableFileStreamCache
-     * @param fileStreamCacheEntries   fileStreamCacheEntries
-     * @param fileStreamCacheSize      fileStreamCacheSize
-     * @param fileStreamCacheStorage   fileStreamCacheStorage
-     * @throws IOException IOException
+     * @param leaderUrl                Leader server url.
+     * @param connectionTimeout        Http connection timeout.
+     * @param statusExpiry             Server status expiry.
+     * @param idleConnectionExpiry     Http connection idle expiry.
+     * @param maxConnection            Max http connection.
+     * @param maxConnectionsPreRoute   Max connections pre route.
+     * @param enableLookupVolumeCache  Enable lookup volume cache.
+     * @param lookupVolumeCacheExpiry  Lookup volume Cache Expiry.
+     * @param lookupVolumeCacheEntries LookupVolumeCacheEntries.
+     * @param enableFileStreamCache    Enable file stream cache.
+     * @param fileStreamCacheEntries   File stream cache entries.
+     * @param fileStreamCacheSize      File stream cache size.
+     * @param fileStreamCacheStorage   File stream cache storage.
+     * @throws IOException Http connection is fail or server response within some error message.
      */
-    public SystemConnection(String leaderUrl, int connectionTimeout, long statusExpiry, long idleConnectionExpiry,
-                            int maxConnection, int maxConnectionsPreRoute, boolean enableLookupVolumeCache,
-                            long lookupVolumeCacheExpiry, int lookupVolumeCacheEntries,
-                            boolean enableFileStreamCache, int fileStreamCacheEntries, long fileStreamCacheSize,
-                            HttpCacheStorage fileStreamCacheStorage)
+    public Connection(String leaderUrl, int connectionTimeout, long statusExpiry, long idleConnectionExpiry,
+                      int maxConnection, int maxConnectionsPreRoute, boolean enableLookupVolumeCache,
+                      long lookupVolumeCacheExpiry, int lookupVolumeCacheEntries,
+                      boolean enableFileStreamCache, int fileStreamCacheEntries, long fileStreamCacheSize,
+                      HttpCacheStorage fileStreamCacheStorage)
             throws IOException {
         this.leaderUrl = leaderUrl;
         this.statusExpiry = statusExpiry;
@@ -183,7 +186,7 @@ public class SystemConnection {
     /**
      * Get core server cluster status.
      *
-     * @return core cluster status.
+     * @return Core cluster status.
      */
     @SuppressWarnings("unused")
     public SystemClusterStatus getSystemClusterStatus() {
@@ -193,7 +196,7 @@ public class SystemConnection {
     /**
      * Get cluster topology status.
      *
-     * @return core topology status.
+     * @return Core topology status.
      */
     @SuppressWarnings("unused")
     public SystemTopologyStatus getSystemTopologyStatus() {
@@ -201,11 +204,11 @@ public class SystemConnection {
     }
 
     /**
-     * Check volume server status
+     * Check volume server status.
      *
-     * @param volumeUrl volumeUrl
-     * @return return
-     * @throws IOException IOException
+     * @param volumeUrl Volume server url.
+     * @return Volume server status.
+     * @throws IOException Http connection is fail or server response within some error message.
      */
     @SuppressWarnings({"unused", "unchecked"})
     public VolumeStatus getVolumeStatus(String volumeUrl) throws IOException {
@@ -220,7 +223,7 @@ public class SystemConnection {
     /**
      * Connection close flag.
      *
-     * @return if result is false, that maybe core server is failover.
+     * @return If result is false, that maybe core server is failover.
      */
     public boolean isConnectionClose() {
         return connectionClose;
@@ -238,7 +241,7 @@ public class SystemConnection {
     /**
      * Get leader core server uri.
      *
-     * @return core server uri
+     * @return Core server uri
      */
     String getLeaderUrl() {
         return this.leaderUrl;
@@ -247,9 +250,9 @@ public class SystemConnection {
     /**
      * Fetch http API json result.
      *
-     * @param request
-     * @return
-     * @throws IOException
+     * @param request Http request.
+     * @return Json fetch by http response.
+     * @throws IOException Http connection is fail or server response within some error message.
      */
     JsonResponse fetchJsonResultByRequest(HttpRequestBase request) throws IOException {
         CloseableHttpResponse response = null;
@@ -285,8 +288,8 @@ public class SystemConnection {
      * Fetch http API status code.
      *
      * @param request Only http method head.
-     * @return
-     * @throws IOException
+     * @return Status code.
+     * @throws IOException Http connection is fail or server response within some error message.
      */
     int fetchStatusCodeByRequest(HttpHead request) throws IOException {
         CloseableHttpResponse response = null;
@@ -310,9 +313,9 @@ public class SystemConnection {
     /**
      * Fetch http API input stream cache.
      *
-     * @param request
-     * @return
-     * @throws IOException
+     * @param request Http request.
+     * @return Stream fetch by http response.
+     * @throws IOException Http connection is fail or server response within some error message.
      */
     StreamResponse fetchStreamCacheByRequest(HttpRequestBase request) throws IOException {
         CloseableHttpResponse response = null;
@@ -339,9 +342,9 @@ public class SystemConnection {
     /**
      * Fetch http API hearers with status code(in array).
      *
-     * @param request
-     * @return
-     * @throws IOException
+     * @param request Only http method head.
+     * @return Header fetch by http response.
+     * @throws IOException Http connection is fail or server response within some error message.
      */
     HeaderResponse fetchHeaderByRequest(HttpHead request) throws IOException {
         CloseableHttpResponse response = null;
@@ -364,19 +367,10 @@ public class SystemConnection {
     }
 
     /**
-     * Get closeable http client from pool.
-     *
-     * @return Closeable http client.
-     */
-    protected CloseableHttpClient getCloseableHttpClientFromPool() {
-        return this.httpClient;
-    }
-
-    /**
      * Fetch core server by seaweedfs Http API.
      *
-     * @param masterUrl core server url with scheme
-     * @return Return the cluster status
+     * @param masterUrl Core server url with scheme.
+     * @return Cluster status.
      */
     @SuppressWarnings("unchecked")
     private SystemClusterStatus fetchSystemClusterStatus(String masterUrl) throws IOException {
@@ -392,7 +386,7 @@ public class SystemConnection {
             throw new SeaweedfsException("not found seaweedfs core leader");
         }
 
-        peers = new ArrayList<MasterStatus>();
+        peers = new ArrayList<>();
 
         if (map.get("Peers") != null) {
             List<String> rawPeerList = (List<String>) map.get("Peers");
@@ -424,7 +418,7 @@ public class SystemConnection {
     /**
      * Find leader core server from peer core server info.
      *
-     * @param peers peers core server
+     * @param peers Peers core server.
      * @return If not found the leader, result is null.
      */
     private String findLeaderUriByPeers(List<MasterStatus> peers) throws IOException {
@@ -455,8 +449,8 @@ public class SystemConnection {
     /**
      * Fetch topology by seaweedfs Http Api.
      *
-     * @param masterUrl core server url with scheme
-     * @return Return the topology status
+     * @param masterUrl Core server url with scheme.
+     * @return Topology status.
      */
     @SuppressWarnings("unchecked")
     private SystemTopologyStatus fetchSystemTopologyStatus(String masterUrl) throws IOException {
@@ -465,7 +459,7 @@ public class SystemConnection {
         Map map = objectMapper.readValue(jsonResponse.json, Map.class);
 
         // Fetch data center from json
-        List<DataCenter> dataCenters = new ArrayList<DataCenter>();
+        List<DataCenter> dataCenters = new ArrayList<>();
         ArrayList<Map<String, Object>> rawDcs =
                 ((ArrayList<Map<String, Object>>) ((Map) (map.get("Topology"))).get("DataCenters"));
         if (rawDcs != null)
@@ -475,7 +469,7 @@ public class SystemConnection {
                 dc.setId((String) rawDc.get("Id"));
                 dc.setMax((Integer) rawDc.get("Max"));
 
-                List<Rack> racks = new ArrayList<Rack>();
+                List<Rack> racks = new ArrayList<>();
                 ArrayList<Map<String, Object>> rawRks =
                         ((ArrayList<Map<String, Object>>) (rawDc.get("Racks")));
                 if (rawRks != null)
@@ -485,7 +479,7 @@ public class SystemConnection {
                         rk.setId((String) rawRk.get("Id"));
                         rk.setFree((Integer) rawRk.get("Free"));
 
-                        List<DataNode> dataNodes = new ArrayList<DataNode>();
+                        List<DataNode> dataNodes = new ArrayList<>();
                         ArrayList<Map<String, Object>> rawDns =
                                 ((ArrayList<Map<String, Object>>) (rawRk.get("DataNodes")));
 
@@ -507,7 +501,7 @@ public class SystemConnection {
             }
 
         // Fetch data layout
-        ArrayList<Layout> layouts = new ArrayList<Layout>();
+        ArrayList<Layout> layouts = new ArrayList<>();
         ArrayList<Map<String, Object>> rawLos =
                 ((ArrayList<Map<String, Object>>) ((Map) (map.get("Topology"))).get("layouts"));
         if (rawLos != null)

@@ -20,10 +20,7 @@
  * SOFTWARE.
  */
 
-package org.lokra.seaweedfs.core;
-
-import org.lokra.seaweedfs.core.topology.DataCenter;
-import org.lokra.seaweedfs.core.topology.Layout;
+package org.lokra.seaweedfs.core.topology;
 
 import java.util.List;
 
