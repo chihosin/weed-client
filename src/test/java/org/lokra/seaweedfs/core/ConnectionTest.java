@@ -30,44 +30,44 @@ import org.lokra.seaweedfs.FileSystemTest;
 /**
  * @author Chiho Sin
  */
-public class connectionTest {
+public class ConnectionTest {
 
-    private static Connection Connection;
+    private static Connection connection;
 
     @BeforeClass
     public static void setBeforeClass() throws Exception {
         FileSystemTest.startup();
         Thread.sleep(1000);
-        Connection = FileSystemTest.fileSource.getConnection();
+        connection = FileSystemTest.fileSource.getConnection();
     }
 
     @Test
     public void getSystemClusterStatus() throws Exception {
-        Assert.assertTrue(Connection.getSystemClusterStatus().getLeader().isActive());
+        Assert.assertTrue(connection.getSystemClusterStatus().getLeader().isActive());
     }
 
     @Test
     public void getSystemTopologyStatus() throws Exception {
-        Assert.assertTrue(Connection.getSystemTopologyStatus().getMax() > 0);
+        Assert.assertTrue(connection.getSystemTopologyStatus().getMax() > 0);
     }
 
     @Test
     public void isConnectionClose() throws Exception {
-        Assert.assertFalse(Connection.isConnectionClose());
+        Assert.assertFalse(connection.isConnectionClose());
     }
 
     @Test
     public void getLeaderUrl() throws Exception {
-        Assert.assertNotNull(Connection.getLeaderUrl());
+        Assert.assertNotNull(connection.getLeaderUrl());
     }
 
     @Test
     public void getVolumeStatus() throws Exception {
         String dataNodeUrl =
-                Connection.getSystemTopologyStatus()
+                connection.getSystemTopologyStatus()
                         .getDataCenters().get(0).getRacks().get(0).getDataNodes().get(0).getUrl();
         Assert.assertEquals(dataNodeUrl,
-                Connection.getVolumeStatus(dataNodeUrl).getUrl());
+                connection.getVolumeStatus(dataNodeUrl).getUrl());
     }
 
 }
