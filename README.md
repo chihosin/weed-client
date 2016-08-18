@@ -27,7 +27,7 @@ For performance, we make some progress:
 <dependency>
   <groupId>org.lokra.seaweedfs</groupId>
   <artifactId>seaweedfs-client</artifactId>
-  <version>0.7.0.RELEASE</version>
+  <version>0.7.1.RELEASE</version>
 </dependency>
 ```
 
@@ -38,7 +38,7 @@ repositories {
 }
 
 dependencies {
-    compile('org.lokra.seaweedfs:seaweedfs-client:0.7.0.RELEASE')
+    compile('org.lokra.seaweedfs:seaweedfs-client:0.7.1.RELEASE')
 }
 ```
 
