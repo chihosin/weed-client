@@ -102,8 +102,8 @@ public class Connection {
      * @param maxConnection            Max http connection.
      * @param maxConnectionsPreRoute   Max connections pre route.
      * @param enableLookupVolumeCache  Enable lookup volume cache.
-     * @param lookupVolumeCacheExpiry  Lookup volume Cache Expiry.
-     * @param lookupVolumeCacheEntries LookupVolumeCacheEntries.
+     * @param lookupVolumeCacheExpiry  Lookup volume cache expiry.
+     * @param lookupVolumeCacheEntries Lookup volume cache entries.
      * @param enableFileStreamCache    Enable file stream cache.
      * @param fileStreamCacheEntries   File stream cache entries.
      * @param fileStreamCacheSize      File stream cache size.
