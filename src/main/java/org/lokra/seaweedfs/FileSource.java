@@ -43,7 +43,7 @@ public class FileSource implements InitializingBean, DisposableBean {
 
     private String host = "localhost";
     private int port = 9333;
-    private int connectionTimeout = 10000;
+    private int connectionTimeout = 10;
     private int statusExpiry = 30;
     private int maxConnection = 100;
     private int idleConnectionExpiry = 30;
