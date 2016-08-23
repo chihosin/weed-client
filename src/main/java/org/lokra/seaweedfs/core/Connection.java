@@ -47,6 +47,7 @@ import org.ehcache.expiry.Duration;
 import org.ehcache.expiry.Expirations;
 import org.lokra.seaweedfs.core.contect.ForceGarbageCollectionParams;
 import org.lokra.seaweedfs.core.contect.LookupVolumeResult;
+import org.lokra.seaweedfs.core.contect.PreAllocateVolumesParams;
 import org.lokra.seaweedfs.core.http.HeaderResponse;
 import org.lokra.seaweedfs.core.http.JsonResponse;
 import org.lokra.seaweedfs.core.http.StreamResponse;
@@ -386,6 +387,28 @@ class Connection {
     void forceGarbageCollection() throws IOException {
         MasterWrapper masterWrapper = new MasterWrapper(this);
         masterWrapper.forceGarbageCollection(new ForceGarbageCollectionParams());
+    }
+
+    /**
+     * Pre-allocate volumes.
+     *
+     * @param sameRackCount       Same rack count.
+     * @param diffRackCount       Different rack count.
+     * @param diffDataCenterCount Different data center count.
+     * @param count               Count.
+     * @param dataCenter          Data center.
+     * @param ttl                 Time to live.
+     * @throws IOException IOException Http connection is fail or server response within some error message.
+     */
+    void preAllocateVolumes(int sameRackCount, int diffRackCount, int diffDataCenterCount, int count, String dataCenter,
+                            String ttl) throws IOException {
+        MasterWrapper masterWrapper = new MasterWrapper(this);
+        masterWrapper.preAllocateVolumes(new PreAllocateVolumesParams(
+                String.valueOf(diffDataCenterCount) + String.valueOf(diffRackCount) + String.valueOf(sameRackCount),
+                count,
+                dataCenter,
+                ttl
+        ));
     }
 
     /**
