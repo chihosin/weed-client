@@ -190,7 +190,6 @@ class Connection {
      *
      * @return Core cluster status.
      */
-    @SuppressWarnings("unused")
     SystemClusterStatus getSystemClusterStatus() {
         return systemClusterStatus;
     }
@@ -200,7 +199,6 @@ class Connection {
      *
      * @return Core topology status.
      */
-    @SuppressWarnings("unused")
     SystemTopologyStatus getSystemTopologyStatus() {
         return systemTopologyStatus;
     }

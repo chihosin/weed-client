@@ -25,6 +25,10 @@ package org.lokra.seaweedfs.core;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.client.cache.HttpCacheStorage;
+import org.lokra.seaweedfs.core.topology.SystemClusterStatus;
+import org.lokra.seaweedfs.core.topology.SystemTopologyStatus;
+import org.lokra.seaweedfs.core.topology.VolumeStatus;
+import org.lokra.seaweedfs.exception.SeaweedfsException;
 import org.lokra.seaweedfs.util.ConnectionUtil;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
@@ -54,7 +58,7 @@ public class FileSource implements InitializingBean, DisposableBean {
     private int fileStreamCacheEntries = 1000;
     private long fileStreamCacheSize = 8192;
     private HttpCacheStorage fileStreamCacheStorage = null;
-    private boolean startup = false;
+    volatile private boolean startup = false;
 
     private Connection connection;
 
@@ -141,6 +145,47 @@ public class FileSource implements InitializingBean, DisposableBean {
     public void preAllocateVolumes(int sameRackCount, int diffRackCount, int diffDataCenterCount, int count, String dataCenter,
                                    String ttl) throws IOException {
         connection.preAllocateVolumes(sameRackCount, diffRackCount, diffDataCenterCount, count, dataCenter, ttl);
+    }
+
+    /**
+     * Get core server cluster status.
+     *
+     * @return Core cluster status.
+     * @throws SeaweedfsException Connection is shutdown.
+     */
+    public SystemClusterStatus getSystemClusterStatus() throws SeaweedfsException {
+        if (startup)
+            return connection.getSystemClusterStatus();
+        else
+            throw new SeaweedfsException("Could not fetch server cluster status at connection is shutdown");
+    }
+
+    /**
+     * Get cluster topology status.
+     *
+     * @return Core topology status.
+     * @throws SeaweedfsException Connection is shutdown.
+     */
+    public SystemTopologyStatus getSystemTopologyStatus() throws SeaweedfsException {
+        if (startup)
+            return connection.getSystemTopologyStatus();
+        else
+            throw new SeaweedfsException("Could not fetch server cluster status at connection is shutdown");
+    }
+
+    /**
+     * Check volume server status.
+     *
+     * @param volumeUrl Volume server url.
+     * @return Volume server status.
+     * @throws IOException Connection is shutdown or
+     *                     Http connection is fail or server response within some error message.
+     */
+    public VolumeStatus getVolumeStatus(String volumeUrl) throws IOException {
+        if (startup)
+            return connection.getVolumeStatus(volumeUrl);
+        else
+            throw new SeaweedfsException("Could not fetch server cluster status at connection is shutdown");
     }
 
     /**
