@@ -40,7 +40,7 @@ import static org.lokra.seaweedfs.core.Connection.LOOKUP_VOLUME_CACHE_ALIAS;
  *
  * @author Chiho Sin
  */
-public class MasterWrapper {
+class MasterWrapper {
 
     private Connection connection;
     private Cache<Long, LookupVolumeResult> lookupVolumeCache;
@@ -51,7 +51,7 @@ public class MasterWrapper {
      *
      * @param connection Connection from file source.
      */
-    public MasterWrapper(Connection connection) {
+    MasterWrapper(Connection connection) {
         this.connection = connection;
         final CacheManager cacheManager = connection.getCacheManager();
         if (cacheManager != null)
@@ -66,7 +66,7 @@ public class MasterWrapper {
      * @return Assign file key result.
      * @throws IOException Http connection is fail or server response within some error message.
      */
-    public AssignFileKeyResult assignFileKey(AssignFileKeyParams params) throws IOException {
+    AssignFileKeyResult assignFileKey(AssignFileKeyParams params) throws IOException {
         checkConnection();
         final String url = connection.getLeaderUrl() + RequestPathStrategy.assignFileKey + params.toUrlParams();
         HttpGet request = new HttpGet(url);
@@ -80,7 +80,7 @@ public class MasterWrapper {
      * @param params Force garbage collection params.
      * @throws IOException Http connection is fail or server response within some error message.
      */
-    public void forceGarbageCollection(ForceGarbageCollectionParams params) throws IOException {
+    void forceGarbageCollection(ForceGarbageCollectionParams params) throws IOException {
         checkConnection();
         final String url = connection.getLeaderUrl() + RequestPathStrategy.forceGarbageCollection + params.toUrlParams();
         HttpGet request = new HttpGet(url);
@@ -94,7 +94,7 @@ public class MasterWrapper {
      * @return pre allocate volumes result.
      * @throws IOException Http connection is fail or server response within some error message.
      */
-    public PreAllocateVolumesResult preAllocateVolumes(PreAllocateVolumesParams params) throws IOException {
+    PreAllocateVolumesResult preAllocateVolumes(PreAllocateVolumesParams params) throws IOException {
         checkConnection();
         final String url = connection.getLeaderUrl() + RequestPathStrategy.preAllocateVolumes + params.toUrlParams();
         HttpGet request = new HttpGet(url);
@@ -109,7 +109,7 @@ public class MasterWrapper {
      * @return Lookup volume result.
      * @throws IOException Http connection is fail or server response within some error message.
      */
-    public LookupVolumeResult lookupVolume(LookupVolumeParams params) throws IOException {
+    LookupVolumeResult lookupVolume(LookupVolumeParams params) throws IOException {
         checkConnection();
         LookupVolumeResult result;
         if (this.lookupVolumeCache != null) {

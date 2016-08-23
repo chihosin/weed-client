@@ -22,6 +22,8 @@
 
 package org.lokra.seaweedfs;
 
+import org.lokra.seaweedfs.core.FileSource;
+
 import java.io.IOException;
 
 /**

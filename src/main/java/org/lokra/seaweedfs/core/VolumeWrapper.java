@@ -46,7 +46,7 @@ import java.util.Map;
  *
  * @author Chiho Sin
  */
-public class VolumeWrapper {
+class VolumeWrapper {
 
     private Connection connection;
     private ObjectMapper objectMapper = new ObjectMapper();
@@ -56,7 +56,7 @@ public class VolumeWrapper {
      *
      * @param Connection Connection from file source.
      */
-    public VolumeWrapper(Connection Connection) {
+    VolumeWrapper(Connection Connection) {
         this.connection = Connection;
     }
 
@@ -72,8 +72,8 @@ public class VolumeWrapper {
      * @return The size returned is the size stored on SeaweedFS.
      * @throws IOException Http connection is fail or server response within some error message.
      */
-    public long uploadFile(String url, String fid, String fileName, InputStream stream, String ttl,
-                           ContentType contentType)
+    long uploadFile(String url, String fid, String fileName, InputStream stream, String ttl,
+                    ContentType contentType)
             throws IOException {
         HttpPost request;
         if (ttl != null)
@@ -98,7 +98,7 @@ public class VolumeWrapper {
      * @param fid File id.
      * @throws IOException Http connection is fail or server response within some error message.
      */
-    public void deleteFile(String url, String fid) throws IOException {
+    void deleteFile(String url, String fid) throws IOException {
         HttpDelete request = new HttpDelete(url + "/" + fid);
         convertResponseStatusToException(connection.fetchJsonResultByRequest(request).statusCode,
                 url, fid, false, false, false, false);
@@ -112,7 +112,7 @@ public class VolumeWrapper {
      * @return If file is exist that result is true.
      * @throws IOException Http connection is fail or server response within some error message.
      */
-    public boolean checkFileExist(String url, String fid) throws IOException {
+    boolean checkFileExist(String url, String fid) throws IOException {
         HttpHead request = new HttpHead(url + "/" + fid);
         final int statusCode = connection.fetchStatusCodeByRequest(request);
         try {
@@ -131,7 +131,7 @@ public class VolumeWrapper {
      * @return File input stream cache at system memory.
      * @throws IOException Http connection is fail or server response within some error message.
      */
-    public StreamResponse getFileStream(String url, String fid) throws IOException {
+    StreamResponse getFileStream(String url, String fid) throws IOException {
         HttpGet request = new HttpGet(url + "/" + fid);
         StreamResponse cache = connection.fetchStreamCacheByRequest(request);
         convertResponseStatusToException(cache.getHttpResponseStatusCode(), url, fid, false, false, false, false);
@@ -146,7 +146,7 @@ public class VolumeWrapper {
      * @return File status header.
      * @throws IOException Http connection is fail or server response within some error message.
      */
-    public HeaderResponse getFileStatusHeader(String url, String fid) throws IOException {
+    HeaderResponse getFileStatusHeader(String url, String fid) throws IOException {
         HttpHead request = new HttpHead(url + "/" + fid);
         HeaderResponse cache = connection.fetchHeaderByRequest(request);
         convertResponseStatusToException(cache.getHttpResponseStatusCode(), url, fid, false, false, false, false);
@@ -154,7 +154,7 @@ public class VolumeWrapper {
     }
 
     /**
-     * @param statusCode
+     * @param statusCode         Server response code.
      * @param url                Server url.
      * @param fid                File id.
      * @param ignoreNotFound     Ignore http response not found status.

@@ -25,6 +25,7 @@ package org.lokra.seaweedfs;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.lokra.seaweedfs.core.FileTemplate;
 import org.lokra.seaweedfs.core.file.FileHandleStatus;
 
 import java.io.ByteArrayInputStream;

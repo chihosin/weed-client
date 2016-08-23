@@ -45,6 +45,7 @@ import org.ehcache.config.builders.CacheManagerBuilder;
 import org.ehcache.config.builders.ResourcePoolsBuilder;
 import org.ehcache.expiry.Duration;
 import org.ehcache.expiry.Expirations;
+import org.lokra.seaweedfs.core.contect.ForceGarbageCollectionParams;
 import org.lokra.seaweedfs.core.contect.LookupVolumeResult;
 import org.lokra.seaweedfs.core.http.HeaderResponse;
 import org.lokra.seaweedfs.core.http.JsonResponse;
@@ -65,7 +66,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @author Chiho Sin
  */
-public class Connection {
+class Connection {
 
     static final String LOOKUP_VOLUME_CACHE_ALIAS = "lookupVolumeCache";
 
@@ -110,11 +111,11 @@ public class Connection {
      * @param fileStreamCacheStorage   File stream cache storage.
      * @throws IOException Http connection is fail or server response within some error message.
      */
-    public Connection(String leaderUrl, int connectionTimeout, long statusExpiry, long idleConnectionExpiry,
-                      int maxConnection, int maxConnectionsPreRoute, boolean enableLookupVolumeCache,
-                      long lookupVolumeCacheExpiry, int lookupVolumeCacheEntries,
-                      boolean enableFileStreamCache, int fileStreamCacheEntries, long fileStreamCacheSize,
-                      HttpCacheStorage fileStreamCacheStorage)
+    Connection(String leaderUrl, int connectionTimeout, long statusExpiry, long idleConnectionExpiry,
+               int maxConnection, int maxConnectionsPreRoute, boolean enableLookupVolumeCache,
+               long lookupVolumeCacheExpiry, int lookupVolumeCacheEntries,
+               boolean enableFileStreamCache, int fileStreamCacheEntries, long fileStreamCacheSize,
+               HttpCacheStorage fileStreamCacheStorage)
             throws IOException {
         this.leaderUrl = leaderUrl;
         this.statusExpiry = statusExpiry;
@@ -137,7 +138,7 @@ public class Connection {
     /**
      * Start up polls for core leader.
      */
-    public void startup() {
+    void startup() {
         log.info("core connection is startup now");
         final RequestConfig requestConfig = RequestConfig.custom()
                 .setConnectTimeout(this.connectionTimeout)
@@ -176,7 +177,7 @@ public class Connection {
     /**
      * Shutdown polls for core leader.
      */
-    public void stop() {
+    void stop() {
         log.info("core connection is shutdown now");
         closeCache();
         this.pollClusterStatusThread.shutdown();
@@ -189,7 +190,7 @@ public class Connection {
      * @return Core cluster status.
      */
     @SuppressWarnings("unused")
-    public SystemClusterStatus getSystemClusterStatus() {
+    SystemClusterStatus getSystemClusterStatus() {
         return systemClusterStatus;
     }
 
@@ -199,7 +200,7 @@ public class Connection {
      * @return Core topology status.
      */
     @SuppressWarnings("unused")
-    public SystemTopologyStatus getSystemTopologyStatus() {
+    SystemTopologyStatus getSystemTopologyStatus() {
         return systemTopologyStatus;
     }
 
@@ -211,7 +212,7 @@ public class Connection {
      * @throws IOException Http connection is fail or server response within some error message.
      */
     @SuppressWarnings({"unused", "unchecked"})
-    public VolumeStatus getVolumeStatus(String volumeUrl) throws IOException {
+    VolumeStatus getVolumeStatus(String volumeUrl) throws IOException {
         HttpGet request = new HttpGet(volumeUrl + RequestPathStrategy.checkVolumeStatus);
         JsonResponse jsonResponse = fetchJsonResultByRequest(request);
         VolumeStatus volumeStatus = objectMapper.readValue(
@@ -225,7 +226,7 @@ public class Connection {
      *
      * @return If result is false, that maybe core server is failover.
      */
-    public boolean isConnectionClose() {
+    boolean isConnectionClose() {
         return connectionClose;
     }
 
@@ -364,6 +365,27 @@ public class Connection {
             request.releaseConnection();
         }
         return headerResponse;
+    }
+
+    /**
+     * Force garbage collection.
+     *
+     * @param garbageThreshold Garbage threshold.
+     * @throws IOException Http connection is fail or server response within some error message.
+     */
+    void forceGarbageCollection(float garbageThreshold) throws IOException {
+        MasterWrapper masterWrapper = new MasterWrapper(this);
+        masterWrapper.forceGarbageCollection(new ForceGarbageCollectionParams(garbageThreshold));
+    }
+
+    /**
+     * Force garbage collection.
+     *
+     * @throws IOException Http connection is fail or server response within some error message.
+     */
+    void forceGarbageCollection() throws IOException {
+        MasterWrapper masterWrapper = new MasterWrapper(this);
+        masterWrapper.forceGarbageCollection(new ForceGarbageCollectionParams());
     }
 
     /**

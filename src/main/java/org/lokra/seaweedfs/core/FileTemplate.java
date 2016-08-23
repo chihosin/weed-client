@@ -20,14 +20,11 @@
  * SOFTWARE.
  */
 
-package org.lokra.seaweedfs;
+package org.lokra.seaweedfs.core;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.entity.ContentType;
-import org.lokra.seaweedfs.core.Connection;
-import org.lokra.seaweedfs.core.MasterWrapper;
-import org.lokra.seaweedfs.core.VolumeWrapper;
 import org.lokra.seaweedfs.core.contect.*;
 import org.lokra.seaweedfs.core.file.FileHandleStatus;
 import org.lokra.seaweedfs.core.http.HeaderResponse;

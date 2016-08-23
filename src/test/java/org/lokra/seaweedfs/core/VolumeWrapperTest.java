@@ -26,7 +26,6 @@ import org.apache.http.entity.ContentType;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.lokra.seaweedfs.FileSource;
 import org.lokra.seaweedfs.FileSystemTest;
 import org.lokra.seaweedfs.core.contect.AssignFileKeyParams;
 import org.lokra.seaweedfs.core.contect.AssignFileKeyResult;

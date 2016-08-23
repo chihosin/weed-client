@@ -27,6 +27,7 @@ import org.apache.commons.logging.LogFactory;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.lokra.seaweedfs.core.FileSource;
 
 /**
  * @author Chiho Sin
