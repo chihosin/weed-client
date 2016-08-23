@@ -109,6 +109,41 @@ public class FileSource implements InitializingBean, DisposableBean {
     }
 
     /**
+     * Force garbage collection.
+     *
+     * @throws IOException Http connection is fail or server response within some error message.
+     */
+    public void forceGarbageCollection() throws IOException {
+        connection.forceGarbageCollection();
+    }
+
+    /**
+     * Force garbage collection.
+     *
+     * @param garbageThreshold Garbage threshold.
+     * @throws IOException Http connection is fail or server response within some error message.
+     */
+    public void forceGarbageCollection(float garbageThreshold) throws IOException {
+        connection.forceGarbageCollection(garbageThreshold);
+    }
+
+    /**
+     * Pre-allocate volumes.
+     *
+     * @param sameRackCount       Same rack count.
+     * @param diffRackCount       Different rack count.
+     * @param diffDataCenterCount Different data center count.
+     * @param count               Count.
+     * @param dataCenter          Data center.
+     * @param ttl                 Time to live.
+     * @throws IOException IOException Http connection is fail or server response within some error message.
+     */
+    public void preAllocateVolumes(int sameRackCount, int diffRackCount, int diffDataCenterCount, int count, String dataCenter,
+                                   String ttl) throws IOException {
+        connection.preAllocateVolumes(sameRackCount, diffRackCount, diffDataCenterCount, count, dataCenter, ttl);
+    }
+
+    /**
      * Working with Spring framework startup
      *
      * @throws IOException Http connection is fail or server response within some error message.
