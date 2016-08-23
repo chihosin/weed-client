@@ -20,14 +20,14 @@
  * SOFTWARE.
  */
 
-package org.lokra.seaweedfs;
+package org.lokra.seaweedfs.core;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.lokra.seaweedfs.core.FileSource;
+import org.lokra.seaweedfs.FileSystemTest;
 
 /**
  * @author Chiho Sin

@@ -31,14 +31,19 @@ import org.lokra.seaweedfs.FileSystemTest;
  * @author Chiho Sin
  */
 public class ConnectionTest {
+    @Test
+    public void forceGarbageCollection() throws Exception {
+        connection.forceGarbageCollection();
+    }
 
-    private static Connection connection;
+    @Test
+    public void forceGarbageCollectionWithThreshold() throws Exception {
+        connection.forceGarbageCollection(0.4f);
+    }
 
-    @BeforeClass
-    public static void setBeforeClass() throws Exception {
-        FileSystemTest.startup();
-        Thread.sleep(1000);
-        connection = FileSystemTest.fileSource.getConnection();
+    @Test
+    public void preAllocateVolumes() throws Exception {
+        connection.preAllocateVolumes(0, 0, 0, 2, null, null);
     }
 
     @Test
@@ -68,6 +73,15 @@ public class ConnectionTest {
                         .getDataCenters().get(0).getRacks().get(0).getDataNodes().get(0).getUrl();
         Assert.assertEquals(dataNodeUrl,
                 connection.getVolumeStatus(dataNodeUrl).getUrl());
+    }
+
+    private static Connection connection;
+
+    @BeforeClass
+    public static void setBeforeClass() throws Exception {
+        FileSystemTest.startup();
+        Thread.sleep(1000);
+        connection = FileSystemTest.fileSource.getConnection();
     }
 
 }

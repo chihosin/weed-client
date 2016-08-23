@@ -20,11 +20,12 @@
  * SOFTWARE.
  */
 
-package org.lokra.seaweedfs;
+package org.lokra.seaweedfs.core;
 
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.lokra.seaweedfs.FileSystemTest;
 import org.lokra.seaweedfs.core.FileTemplate;
 import org.lokra.seaweedfs.core.file.FileHandleStatus;
 
