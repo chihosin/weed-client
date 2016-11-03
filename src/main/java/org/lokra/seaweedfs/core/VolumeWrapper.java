@@ -31,6 +31,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.apache.http.util.CharsetUtils;
 import org.lokra.seaweedfs.core.http.HeaderResponse;
 import org.lokra.seaweedfs.core.http.JsonResponse;
 import org.lokra.seaweedfs.core.http.StreamResponse;
@@ -82,7 +83,7 @@ class VolumeWrapper {
             request = new HttpPost(url + "/" + fid);
 
         MultipartEntityBuilder builder = MultipartEntityBuilder.create();
-        builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
+        builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE).setCharset(CharsetUtils.get("UTF-8"));
         builder.addBinaryBody("upload", stream, contentType, fileName);
         HttpEntity entity = builder.build();
         request.setEntity(entity);
