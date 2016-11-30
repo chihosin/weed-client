@@ -24,10 +24,12 @@ package org.lokra.seaweedfs.core.contect;
 
 import org.lokra.seaweedfs.util.ConnectionUtil;
 
+import java.io.Serializable;
+
 /**
  * @author Chiho Sin
  */
-public class AssignFileKeyResult {
+public class AssignFileKeyResult implements Serializable {
 
     private Integer count;
     private String fid;

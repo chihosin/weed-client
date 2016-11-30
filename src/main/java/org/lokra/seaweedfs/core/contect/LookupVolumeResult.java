@@ -22,13 +22,14 @@
 
 package org.lokra.seaweedfs.core.contect;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Random;
 
 /**
  * @author Chiho Sin
  */
-public class LookupVolumeResult {
+public class LookupVolumeResult implements Serializable {
 
     private long volumeId;
     private Random random = new Random();

@@ -26,12 +26,13 @@ package org.lokra.seaweedfs.core.topology;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
  * @author Chiho Sin
  */
-public class VolumeStatus {
+public class VolumeStatus implements Serializable {
 
     @JsonIgnoreProperties
     private String url;

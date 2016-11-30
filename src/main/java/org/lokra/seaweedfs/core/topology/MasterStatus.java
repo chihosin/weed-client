@@ -25,10 +25,12 @@ package org.lokra.seaweedfs.core.topology;
 
 import org.lokra.seaweedfs.util.ConnectionUtil;
 
+import java.io.Serializable;
+
 /**
  * @author Chiho Sin
  */
-public class MasterStatus {
+public class MasterStatus implements Serializable {
 
     private String url;
     private boolean isActive;

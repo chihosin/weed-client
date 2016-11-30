@@ -22,10 +22,12 @@
 
 package org.lokra.seaweedfs.core.file;
 
+import java.io.Serializable;
+
 /**
  * @author Chiho Sin
  */
-public class FileHandleStatus {
+public class FileHandleStatus implements Serializable {
 
     private String fileId;
     private long lastModified;

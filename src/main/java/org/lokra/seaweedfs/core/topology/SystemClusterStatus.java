@@ -22,9 +22,10 @@
 
 package org.lokra.seaweedfs.core.topology;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class SystemClusterStatus {
+public class SystemClusterStatus implements Serializable {
 
     private MasterStatus leader;
     private List<MasterStatus> peers;

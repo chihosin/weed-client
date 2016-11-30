@@ -24,10 +24,12 @@ package org.lokra.seaweedfs.core.contect;
 
 import org.lokra.seaweedfs.util.ConnectionUtil;
 
+import java.io.Serializable;
+
 /**
  * @author Chiho Sin
  */
-public class LocationResult {
+public class LocationResult implements Serializable {
     private String url;
     private String publicUrl;
 

@@ -22,12 +22,13 @@
 
 package org.lokra.seaweedfs.core.topology;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
  * @author Chiho Sin
  */
-public class SystemTopologyStatus {
+public class SystemTopologyStatus implements Serializable {
 
     private int max;
     private int free;

@@ -22,10 +22,12 @@
 
 package org.lokra.seaweedfs.core.contect;
 
+import java.io.Serializable;
+
 /**
  * @author Chiho Sin
  */
-public class PreAllocateVolumesResult {
+public class PreAllocateVolumesResult implements Serializable {
 
     private int count;
 
