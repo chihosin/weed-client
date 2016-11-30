@@ -80,7 +80,7 @@ public class FileSource implements InitializingBean, DisposableBean {
         if (this.startup) {
             log.info("connect is already startup");
         } else {
-            log.info("start connect to the seaweedfs core server [" +
+            log.info("start connect to the seaweedfs master server [" +
                     ConnectionUtil.convertUrlWithScheme(host + ":" + port) + "]");
             if (this.connection == null) {
                 this.connection = new Connection(
@@ -107,7 +107,7 @@ public class FileSource implements InitializingBean, DisposableBean {
      * Shutdown connect to the any Seaweedfs server
      */
     public void shutdown() {
-        log.info("stop connect to the seaweedfs core server");
+        log.info("stop connect to the seaweedfs master server");
         if (this.connection != null)
             this.connection.stop();
     }
@@ -148,7 +148,7 @@ public class FileSource implements InitializingBean, DisposableBean {
     }
 
     /**
-     * Get core server cluster status.
+     * Get master server  cluster status.
      *
      * @return Core cluster status.
      * @throws SeaweedfsException Connection is shutdown.

@@ -140,7 +140,6 @@ class Connection {
      * Start up polls for core leader.
      */
     void startup() {
-        log.info("core connection is startup now");
         final RequestConfig requestConfig = RequestConfig.custom()
                 .setConnectTimeout(this.connectionTimeout)
                 .build();
@@ -171,18 +170,20 @@ class Connection {
                     .build();
         }
         initCache();
+        this.pollClusterStatusThread.updateSystemStatus(true, true);
         this.pollClusterStatusThread.start();
         this.idleConnectionMonitorThread.start();
+        log.info("seaweedfs master server connection is startup");
     }
 
     /**
      * Shutdown polls for core leader.
      */
     void stop() {
-        log.info("core connection is shutdown now");
         closeCache();
         this.pollClusterStatusThread.shutdown();
         this.idleConnectionMonitorThread.shutdown();
+        log.info("seaweedfs master server connection is shutdown");
     }
 
     /**
@@ -609,41 +610,54 @@ class Connection {
         public void run() {
             while (!shutdown) {
                 synchronized (this) {
-                    try {
-                        fetchSystemStatus(leaderUrl);
-                        connectionClose = false;
-                    } catch (IOException e) {
-                        connectionClose = true;
-                        log.error("unable connect to the target seaweedfs core [" + leaderUrl + "]");
-                    }
+                    updateSystemStatus(false, false);
+                }
+            }
+        }
 
-                    try {
-                        if (connectionClose) {
-                            log.info("lookup seaweedfs core leader by peers");
-                            if (systemClusterStatus == null || systemClusterStatus.getPeers().size() == 0) {
-                                log.error("cloud not found the seaweedfs core peers");
-                            } else {
-                                String url = findLeaderUriByPeers(systemClusterStatus.getPeers());
-                                if (url != null) {
-                                    log.error("seaweedfs core cluster is failover");
-                                    fetchSystemStatus(url);
-                                    connectionClose = false;
-                                } else {
-                                    log.error("seaweedfs core cluster is down");
-                                    systemClusterStatus.getLeader().setActive(false);
-                                    connectionClose = true;
-                                }
-                            }
+        void updateSystemStatus(boolean immediate, boolean disposable) {
+            if (!immediate) {
+                try {
+                    Thread.sleep(statusExpiry * 1000);
+                } catch (InterruptedException ignored) {
+                }
+            }
+
+            try {
+                fetchSystemStatus(leaderUrl);
+                connectionClose = false;
+            } catch (IOException e) {
+                connectionClose = true;
+                log.error("unable connect to the target seaweedfs core [" + leaderUrl + "]");
+            }
+
+            try {
+                if (connectionClose) {
+                    log.info("lookup seaweedfs core leader by peers");
+                    if (systemClusterStatus == null || systemClusterStatus.getPeers().size() == 0) {
+                        log.error("cloud not found the seaweedfs core peers");
+                    } else {
+                        String url = findLeaderUriByPeers(systemClusterStatus.getPeers());
+                        if (url != null) {
+                            log.error("seaweedfs core cluster is failover");
+                            fetchSystemStatus(url);
+                            connectionClose = false;
+                        } else {
+                            log.error("seaweedfs core cluster is down");
+                            systemClusterStatus.getLeader().setActive(false);
+                            connectionClose = true;
                         }
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        log.error("unable connect to the seaweedfs core leader");
                     }
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                log.error("unable connect to the seaweedfs core leader");
+            }
 
-                    try {
-                        Thread.sleep(statusExpiry * 1000);
-                    } catch (InterruptedException ignored) {
-                    }
+            if (immediate && !disposable) {
+                try {
+                    Thread.sleep(statusExpiry * 1000);
+                } catch (InterruptedException ignored) {
                 }
             }
         }
@@ -658,8 +672,9 @@ class Connection {
             log.debug("seaweedfs core leader is found [" + leaderUrl + "]");
         }
 
-        void shutdown() {
-            shutdown = true;
+        private void shutdown() {
+            this.shutdown = true;
+            this.interrupt();
             synchronized (this) {
                 notifyAll();
             }
@@ -691,7 +706,8 @@ class Connection {
         }
 
         void shutdown() {
-            shutdown = true;
+            this.shutdown = true;
+            this.interrupt();
             synchronized (this) {
                 notifyAll();
             }
