@@ -403,10 +403,7 @@ public class FileTemplate implements InitializingBean, DisposableBean {
         if (volumeResult.getLocations() == null || volumeResult.getLocations().size() == 0)
             throw new SeaweedfsFileDeleteException(fileId,
                     new SeaweedfsException("can not found the volume server"));
-        if (loadBalance)
-            return volumeResult.getRandomLocation();
-        else
-            return volumeResult.getLocations().get(0);
+        return volumeResult.getLocations().iterator().next();
     }
 
     private String getTargetUrl(String fileId) throws IOException {
