@@ -39,8 +39,14 @@ repositories {
 }
 
 dependencies {
-    compile('com.fasterxml.jackson.core:jackson-databind:2.8.0')
-    compile('com.fasterxml.jackson.core:jackson-core:2.8.0')
+
+    compile group: 'io.github.openfeign', name: 'feign-gson', version: '9.5.1'
+    compile group: 'io.github.openfeign', name: 'feign-slf4j' +
+            '', version: '9.5.1'
+    compile group: 'io.github.openfeign', name: 'feign-jackson', version: '9.5.1'
+    compile group: 'io.github.openfeign', name: 'feign-okhttp', version: '9.5.1'
+    compile group: 'io.github.openfeign', name: 'feign-core', version: '9.5.1'
+
     compile('org.apache.httpcomponents:httpclient:4.5.2')
     compile('org.apache.httpcomponents:httpmime:4.5.2')
     compile('org.apache.httpcomponents:httpclient-cache:4.5.2')
@@ -58,78 +64,3 @@ jacocoTestReport {
 }
 
 check.dependsOn jacocoTestReport
-
-eclipse {
-    classpath {
-        containers.remove('org.eclipse.jdt.launching.JRE_CONTAINER')
-        containers 'org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7'
-    }
-}
-
-uploadArchives {
-    repositories {
-        mavenDeployer {
-
-            def repositoryUrl
-            if (version.toString().split("\\.")[3] == "RELEASE")
-                repositoryUrl = 'https://oss.sonatype.org/service/local/staging/deploy/maven2/'
-            else
-                repositoryUrl = 'https://oss.sonatype.org/content/repositories/snapshots'
-
-            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
-
-            repository(url: repositoryUrl) {
-                if (project.hasProperty('sonatypeUsername'))
-                    authentication(userName: sonatypeUsername, password: sonatypePassword)
-            }
-
-            pom.project {
-                name project.name
-                packaging 'jar'
-                description 'SeaweedFS Client For Java.'
-                url 'https://github.com/lokra-platform/seaweedfs-client'
-
-                scm {
-                    url 'scm:git@github.com:lokra-platform/seaweedfs-client.git'
-                    connection 'scm:git@github.com:lokra-platform/seaweedfs-client.git'
-                    developerConnection 'git@github.com:lokra-platform/seaweedfs-client.git'
-                }
-
-                licenses {
-                    license {
-                        name 'The MIT License (MIT)'
-                        url 'https://mit-license.org'
-                        distribution 'repo'
-                    }
-                }
-
-                developers {
-                    developer {
-                        id 'ChihoSin'
-                        name 'Chiho Sin'
-                    }
-                }
-            }
-        }
-    }
-}
-
-task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier = 'javadoc'
-    from 'build/docs/javadoc'
-}
-
-task sourcesJar(type: Jar) {
-    classifier = 'sources'
-    from sourceSets.main.allSource
-}
-
-artifacts {
-    archives jar
-    archives javadocJar
-    archives sourcesJar
-}
-
-signing {
-    sign configurations.archives
-}
