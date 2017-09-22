@@ -31,8 +31,8 @@ apply plugin: 'jacoco'
 apply plugin: 'maven'
 apply plugin: 'signing'
 
-targetCompatibility = 1.7
-sourceCompatibility = 1.7
+targetCompatibility = 1.8
+sourceCompatibility = 1.8
 
 repositories {
     mavenCentral()
@@ -41,18 +41,15 @@ repositories {
 dependencies {
 
     compile group: 'io.github.openfeign', name: 'feign-gson', version: '9.5.1'
-    compile group: 'io.github.openfeign', name: 'feign-slf4j' +
-            '', version: '9.5.1'
+    compile group: 'io.github.openfeign', name: 'feign-slf4j', version: '9.5.1'
     compile group: 'io.github.openfeign', name: 'feign-jackson', version: '9.5.1'
     compile group: 'io.github.openfeign', name: 'feign-okhttp', version: '9.5.1'
     compile group: 'io.github.openfeign', name: 'feign-core', version: '9.5.1'
+    compile group: 'io.github.openfeign.form', name: 'feign-form', version: '2.2.1'
 
-    compile('org.apache.httpcomponents:httpclient:4.5.2')
-    compile('org.apache.httpcomponents:httpmime:4.5.2')
-    compile('org.apache.httpcomponents:httpclient-cache:4.5.2')
-    compile('org.ehcache:ehcache:3.1.1')
-    compile('org.springframework:spring-core:4.3.1.RELEASE')
-    compile('org.springframework:spring-beans:4.3.1.RELEASE')
+
+    compile group: 'commons-io', name: 'commons-io', version: '2.5'
+    compile group: 'commons-fileupload', name: 'commons-fileupload', version: '1.3.3'
     testCompile('junit:junit:4.11')
 }
 

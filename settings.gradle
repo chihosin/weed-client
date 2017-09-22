@@ -20,5 +20,5 @@
  * SOFTWARE.
  */
 
-rootProject.name = 'seaweedfs-client'
+rootProject.name = 'weed-client'
 
